@@ -10,8 +10,7 @@ namespace Common_Tasks
     {
         private bool eventClearFormOpen = false;
         public event Action EventClearFormClosed;
-        private bool isShutdownCancelled = false; // Cancellation flag
-
+        private bool isShutdownCancelled = false;
         public MainForm()
         {
             InitializeComponent();
@@ -54,7 +53,7 @@ namespace Common_Tasks
                 while (hr >= 24) hr -= 24;
                 var nwTime = hr + ":" + fileContent[0].Split(':')[1];
                 var temp = Convert.ToDateTime(nwTime).ToShortTimeString();
-                shtDwnTmLbl.Text = $"Windows will shutdown on {shutDate}, at {temp}";
+                shtDwnTmLbl.Text = $"Windows will shutdown on {shutDate} {temp}";
                 ShutdownBtn.Enabled = false;
                 CancelBtn.Enabled = true;
                 await CalculateTime();
@@ -64,7 +63,11 @@ namespace Common_Tasks
 
         private async Task CalculateTime()
         {
-            if (isShutdownCancelled) return; // Check cancellation flag
+            if (isShutdownCancelled) 
+            {
+                File.Delete("log");
+                return; 
+            }
 
             string[] logTimeParts = File.ReadAllText("log").Split(',')[0].Split(':');
             int logHour = int.Parse(logTimeParts[0]);
@@ -72,7 +75,7 @@ namespace Common_Tasks
             var remainingHours = logHour - DateTime.Now.Hour;
             var remainingMinutes = logMinute - DateTime.Now.Minute;
             if (remainingMinutes < 0) { remainingMinutes = 60 + remainingMinutes; remainingHours--; }
-            if (remainingHours == 0 && remainingMinutes == 2)
+            if (remainingHours <= 0 && remainingMinutes == 2)
             {
                 File.Delete("log");
                 var remainingSeconds = 119;
@@ -81,7 +84,7 @@ namespace Common_Tasks
                     if (isShutdownCancelled)
                     {
                         taskTrayIcon.Text = string.Empty;
-                        return; // Check cancellation flag
+                        return; 
                     }
 
                     if (remainingSeconds == 1)
@@ -100,13 +103,13 @@ namespace Common_Tasks
             string remainingTimeString = $"{remainingHours} hours and {remainingMinutes} minutes remaining.";
             remTmLbl.Text = remainingTimeString;
             taskTrayIcon.Text = remTmLbl.Text;
-            await Task.Delay(1000); // Delay for 1 second
-            await CalculateTime(); // Recursive call
+            await Task.Delay(1000); 
+            await CalculateTime(); 
         }
 
         private void ShutdownBtn_Click(object sender, EventArgs e)
         {
-            isShutdownCancelled = false; // Reset cancellation flag
+            isShutdownCancelled = false; 
 
             decimal minute = MinuteBoard.Value * 60;
             decimal hours = HoursBoard.Value * 3600;
@@ -119,6 +122,7 @@ namespace Common_Tasks
                 DateTime start = DateTime.Now;
                 decimal shutHr;
                 decimal shutMn;
+                DayOfWeek shutDate;
                 int day = 0;
                 shutHr = start.Hour + HoursBoard.Value;
                 shutMn = start.Minute + MinuteBoard.Value;
@@ -138,7 +142,12 @@ namespace Common_Tasks
                 };
 
                 _ = Process.Start(psi);
-                File.WriteAllText("log", shutHr + ":" + shutMn + "," + (DateTime.Now.DayOfWeek + day).ToString());
+                shutDate = DateTime.Now.DayOfWeek + day;
+                while (shutDate > DayOfWeek.Saturday)
+                {
+                    shutDate -= 6;
+                }
+                File.WriteAllText("log", shutHr + ":" + shutMn + "," + shutDate.ToString());
                 CancelBtn.Enabled = true;
                 _ = LoadTimer();
             }
@@ -148,7 +157,7 @@ namespace Common_Tasks
 
         private void CancelBtn_Click(object sender, EventArgs e)
         {
-            isShutdownCancelled = true; // Set cancellation flag
+            isShutdownCancelled = true;
             taskTrayIcon.Text = "Common Tasks";
             remTmLbl.Text = string.Empty;
             MinuteBoard.Value = 0;

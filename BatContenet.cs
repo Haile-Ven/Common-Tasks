@@ -8,8 +8,11 @@
 REM Function to check if a service is running
 sc query WerSvc | findstr /i ""RUNNING""
 if %errorlevel% equ 0 (
+    set ""werSvcWasRunning=true""
     REM Stop Windows Error Reporting service
     net stop WerSvc
+) else (
+    set ""werSvcWasRunning=false""
 )
 
 REM Clear Event Logs
@@ -22,8 +25,7 @@ del /f /S /Q /A ""%ProgramData%\Microsoft\Windows\WER\ReportQueue\*""
 del /f /S /Q /A ""%ProgramData%\Microsoft\Windows\WER\ReportArchive\*""
 
 REM Start Windows Error Reporting service if it was running initially
-sc query WerSvc | findstr /i ""RUNNING""
-if %errorlevel% equ 1 (
+if ""%werSvcWasRunning%""==""true"" (
     net start WerSvc
 )
 
@@ -43,6 +45,7 @@ goto :eof
 
 :theEnd
 Exit
+
 ";
 
         public const string EventCountBatchContent = @"
