@@ -64,7 +64,11 @@ namespace Common_Tasks
 
         private async Task CalculateTime()
         {
-            if (isShutdownCancelled) return; // Check cancellation flag
+            if (isShutdownCancelled) 
+            {
+                File.Delete("log");
+                return; 
+            }
 
             string[] logTimeParts = File.ReadAllText("log").Split(',')[0].Split(':');
             int logHour = int.Parse(logTimeParts[0]);
@@ -72,7 +76,7 @@ namespace Common_Tasks
             var remainingHours = logHour - DateTime.Now.Hour;
             var remainingMinutes = logMinute - DateTime.Now.Minute;
             if (remainingMinutes < 0) { remainingMinutes = 60 + remainingMinutes; remainingHours--; }
-            if (remainingHours == 0 && remainingMinutes == 2)
+            if (remainingHours <= 0 && remainingMinutes == 2)
             {
                 File.Delete("log");
                 var remainingSeconds = 119;
