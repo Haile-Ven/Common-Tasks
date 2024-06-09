@@ -153,7 +153,7 @@ namespace Common_Tasks
                 File.WriteAllText("log", shutHr + ":" +
                     shutMn + "," +
                     shutDate.ToString() + "-" +
-                    shutDateNum.Date.ToShortDateString());
+                    shutDateNum.ToString("MMMM d, yyyy"));
                 CancelBtn.Enabled = true;
                 _ = LoadTimer();
             }
