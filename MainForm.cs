@@ -74,7 +74,7 @@ namespace Common_Tasks
             int logMinute = int.Parse(logTimeParts[1]);
             var remainingHours = logHour - DateTime.Now.Hour;
             var remainingMinutes = logMinute - DateTime.Now.Minute;
-            if (remainingMinutes < 0) { remainingMinutes = 60 + remainingMinutes; remainingHours--; }
+            if (remainingHours > 0 && remainingMinutes < 0) { remainingMinutes = 60 + remainingMinutes; remainingHours--; }
             if (remainingHours <= 0 && remainingMinutes == 2)
             {
                 File.Delete("log");
@@ -109,8 +109,7 @@ namespace Common_Tasks
 
         private void ShutdownBtn_Click(object sender, EventArgs e)
         {
-            isShutdownCancelled = false; 
-
+            isShutdownCancelled = false;
             decimal minute = MinuteBoard.Value * 60;
             decimal hours = HoursBoard.Value * 3600;
             decimal time = minute + hours;
