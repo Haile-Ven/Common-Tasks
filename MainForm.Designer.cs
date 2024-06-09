@@ -171,7 +171,7 @@ namespace Common_Tasks
             // 
             remTmLbl.AutoSize = true;
             remTmLbl.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            remTmLbl.Location = new System.Drawing.Point(14, 50);
+            remTmLbl.Location = new System.Drawing.Point(14, 66);
             remTmLbl.Name = "remTmLbl";
             remTmLbl.Size = new System.Drawing.Size(0, 18);
             remTmLbl.TabIndex = 14;
@@ -206,7 +206,7 @@ namespace Common_Tasks
             timerPanel.Location = new System.Drawing.Point(2, 368);
             timerPanel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             timerPanel.Name = "timerPanel";
-            timerPanel.Size = new System.Drawing.Size(353, 79);
+            timerPanel.Size = new System.Drawing.Size(353, 97);
             timerPanel.TabIndex = 20;
             // 
             // taskTrayIcon

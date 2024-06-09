@@ -47,13 +47,14 @@ namespace Common_Tasks
         {
             if (File.Exists("log"))
             {
-                string[] fileContent = File.ReadAllText("log").Split(',');
-                string shutDate = fileContent[1];
-                var hr = Convert.ToInt32(fileContent[0].Split(':')[0]);
+                string[] fileContent = File.ReadAllText("log").Split('-');
+                string shutDate = fileContent[0].Split(',')[1];
+                string shutDateNum = fileContent[1];
+                var hr = Convert.ToInt32(fileContent[0].Split(',')[0].Split(':')[0]);
                 while (hr >= 24) hr -= 24;
-                var nwTime = hr + ":" + fileContent[0].Split(':')[1];
+                var nwTime = hr + ":" + fileContent[0].Split(',')[0].Split(':')[1];
                 var temp = Convert.ToDateTime(nwTime).ToShortTimeString();
-                shtDwnTmLbl.Text = $"Windows will shutdown on {shutDate} {temp}";
+                shtDwnTmLbl.Text = $"Windows will shutdown on\n{shutDate+", "+ shutDateNum} {temp}";
                 ShutdownBtn.Enabled = false;
                 CancelBtn.Enabled = true;
                 await CalculateTime();
@@ -122,6 +123,7 @@ namespace Common_Tasks
                 decimal shutHr;
                 decimal shutMn;
                 DayOfWeek shutDate;
+                DateTime shutDateNum;
                 int day = 0;
                 shutHr = start.Hour + HoursBoard.Value;
                 shutMn = start.Minute + MinuteBoard.Value;
@@ -142,11 +144,16 @@ namespace Common_Tasks
 
                 _ = Process.Start(psi);
                 shutDate = DateTime.Now.DayOfWeek + day;
+                shutDateNum= DateTime.Now;
+                shutDateNum = shutDateNum.AddDays(day);
                 while (shutDate > DayOfWeek.Saturday)
                 {
                     shutDate -= 6;
                 }
-                File.WriteAllText("log", shutHr + ":" + shutMn + "," + shutDate.ToString());
+                File.WriteAllText("log", shutHr + ":" +
+                    shutMn + "," +
+                    shutDate.ToString() + "-" +
+                    shutDateNum.Date.ToShortDateString());
                 CancelBtn.Enabled = true;
                 _ = LoadTimer();
             }
