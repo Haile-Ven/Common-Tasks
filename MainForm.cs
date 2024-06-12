@@ -74,7 +74,8 @@ namespace Common_Tasks
             int logHour = int.Parse(logTimeParts[0]);
             int logMinute = int.Parse(logTimeParts[1]);
             var remainingHours = logHour - DateTime.Now.Hour;
-            var remainingMinutes = logMinute - DateTime.Now.Minute;
+            if (DateTime.Now.Hour == 0) remainingHours = logHour - 24;
+                var remainingMinutes = logMinute - DateTime.Now.Minute;
             if (remainingHours > 0 && remainingMinutes < 0) { remainingMinutes = 60 + remainingMinutes; remainingHours--; }
             if (remainingHours <= 0 && remainingMinutes == 2)
             {
