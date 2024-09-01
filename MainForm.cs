@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -11,9 +12,15 @@ namespace Common_Tasks
         private bool eventClearFormOpen = false;
         public event Action EventClearFormClosed;
         private bool isShutdownCancelled = false;
+        private Size defaultFormSize;
+        private Point defaultFormLocation;
+        private Size defaultPanelSize;
         public MainForm()
         {
             InitializeComponent();
+            defaultFormSize = this.ClientSize;
+            defaultFormLocation = this.Location;
+            defaultPanelSize = timerPanel.Size;
             _ = LoadTimer();
         }
 
@@ -47,117 +54,130 @@ namespace Common_Tasks
         {
             if (File.Exists("log"))
             {
-                string[] fileContent = File.ReadAllText("log").Split('-');
-                string shutDate = fileContent[0].Split(',')[1];
-                string shutDateNum = fileContent[1];
-                var hr = Convert.ToInt32(fileContent[0].Split(',')[0].Split(':')[0]);
-                while (hr >= 24) hr -= 24;
-                var nwTime = hr + ":" + fileContent[0].Split(',')[0].Split(':')[1];
-                var temp = Convert.ToDateTime(nwTime).ToShortTimeString();
-                shtDwnTmLbl.Text = $"Windows will shutdown on\n{shutDate+", "+ shutDateNum} {temp}";
+                // Read the shutdown time from the log file
+                string fileContent = File.ReadAllText("log");
+                DateTime shutdownTime = DateTime.Parse(fileContent);
+
+                // Convert to desired display format: "dddd, dd MMMM yyyy hh:mm tt"
+                string formattedShutdownTime = shutdownTime.ToString("dddd, dd MMMM yyyy hh:mm tt");
+
+                // Display the formatted shutdown time
+                shtDwnTmLbl.Text = $"Windows will shutdown on\n{formattedShutdownTime}";
                 ShutdownBtn.Enabled = false;
                 CancelBtn.Enabled = true;
+
                 await CalculateTime();
             }
-            else CancelBtn.Enabled = false;
+            else
+            {
+                CancelBtn.Enabled = false;
+            }
         }
 
         private async Task CalculateTime()
         {
-            if (isShutdownCancelled) 
+            try
             {
-                File.Delete("log");
-                return; 
-            }
+                if (isShutdownCancelled)
+                {
+                    File.Delete("log");
+                    return;
+                }
 
-            string[] logTimeParts = File.ReadAllText("log").Split(',')[0].Split(':');
-            int logHour = int.Parse(logTimeParts[0]);
-            int logMinute = int.Parse(logTimeParts[1]);
-            var remainingHours = logHour - DateTime.Now.Hour;
-            if (DateTime.Now.Hour == 0) remainingHours = logHour - 24;
-                var remainingMinutes = logMinute - DateTime.Now.Minute;
-            if (remainingHours > 0 && remainingMinutes < 0) { remainingMinutes = 60 + remainingMinutes; remainingHours--; }
-            if (remainingHours <= 0 && remainingMinutes == 2)
-            {
-                File.Delete("log");
-                var remainingSeconds = 119;
-                while (remainingSeconds != 0)
+                string fileContent = File.ReadAllText("log");
+                DateTime shutdownTime = DateTime.Parse(fileContent);
+
+                while (true)
                 {
                     if (isShutdownCancelled)
                     {
-                        taskTrayIcon.Text = string.Empty;
-                        return; 
+                        File.Delete("log");
+                        return; // Exit the method when canceled
                     }
 
-                    if (remainingSeconds == 1)
+                    TimeSpan remainingTime = shutdownTime - DateTime.Now;
+
+                    if (remainingTime <= TimeSpan.Zero)
                     {
                         remTmLbl.Text = "Shutdown time reached.";
+                        taskTrayIcon.Text = remTmLbl.Text;
+                        File.Delete("log");
                         return;
+                    }
+
+                    int remainingDays = remainingTime.Days;
+                    int remainingHours = remainingTime.Hours;
+                    int remainingMinutes = remainingTime.Minutes;
+                    int remainingSeconds = remainingTime.Seconds;
+
+                    string remainingTimeString;
+                    if (remainingDays > 0)
+                    {
+                        remainingTimeString = $"{remainingDays} day{(remainingDays > 1 ? "s" : "")}, " +
+                                              $"{remainingHours} hour{(remainingHours > 1 ? "s" : "")}, " +
+                                              $"{remainingMinutes} minute{(remainingMinutes > 1 ? "s" : "")}, and " +
+                                              $"{remainingSeconds} second{(remainingSeconds > 1 ? "s" : "")} remaining.";
                     }
                     else
                     {
-                        remTmLbl.Text = $"{remainingSeconds--} seconds remaining.";
-                        taskTrayIcon.Text = remTmLbl.Text;
-                        await Task.Delay(1000);
+                        remainingTimeString = $"{remainingHours} hour{(remainingHours > 1 ? "s" : "")}, " +
+                                              $"{remainingMinutes} minute{(remainingMinutes > 1 ? "s" : "")}, and " +
+                                              $"{remainingSeconds} second{(remainingSeconds > 1 ? "s" : "")} remaining.";
                     }
+
+                    remTmLbl.Text = remainingTimeString;
+                    taskTrayIcon.Text = remainingTimeString;
+
+                    AdjustLabelSize(remTmLbl);
+                    AdjustPanelSize(timerPanel, remTmLbl);
+                    AdjustFormSize(this, timerPanel);
+
+                    await Task.Delay(1000);
                 }
             }
-            string remainingTimeString = $"{remainingHours} hours and {remainingMinutes} minutes remaining.";
-            remTmLbl.Text = remainingTimeString;
-            taskTrayIcon.Text = remTmLbl.Text;
-            await Task.Delay(1000); 
-            await CalculateTime(); 
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in CalculateTime: {ex.Message}");
+                remTmLbl.Text = "Error calculating remaining time.";
+                AdjustLabelSize(remTmLbl);
+                AdjustPanelSize(timerPanel, remTmLbl);
+                AdjustFormSize(this,timerPanel);
+            }
         }
+
 
         private void ShutdownBtn_Click(object sender, EventArgs e)
         {
             isShutdownCancelled = false;
-            decimal minute = MinuteBoard.Value * 60;
+
+            decimal minutes = MinuteBoard.Value * 60;
             decimal hours = HoursBoard.Value * 3600;
-            decimal time = minute + hours;
-            decimal tempTime = time / 3600;
-            string msg = time <= 0 ? "Windows will shutdown immediately"
+            decimal totalSeconds = minutes + hours;
+
+            string msg = totalSeconds <= 0 ? "Windows will shutdown immediately"
                 : $"Windows will shutdown in {HoursBoard.Value} hours and {MinuteBoard.Value} minutes.";
+
             if (MessageBox.Show(msg, "Confirm", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK)
             {
-                DateTime start = DateTime.Now;
-                decimal shutHr;
-                decimal shutMn;
-                DayOfWeek shutDate;
-                DateTime shutDateNum;
-                int day = 0;
-                shutHr = start.Hour + HoursBoard.Value;
-                shutMn = start.Minute + MinuteBoard.Value;
-                if (shutMn > 60)
-                {
-                    shutMn -= 60;
-                    shutHr++;
-                }
-                var tmpHr = shutHr;
-                while (tmpHr >= 24) { day++; tmpHr -= 24; }
+                DateTime shutdownTime = DateTime.Now.AddSeconds((double)totalSeconds);
+
                 ProcessStartInfo psi = new ProcessStartInfo
                 {
                     FileName = "shutdown",
-                    Arguments = $"/s /t {time}",
+                    Arguments = $"/s /t {(int)totalSeconds}",
                     CreateNoWindow = true,
                     UseShellExecute = false
                 };
 
                 _ = Process.Start(psi);
-                shutDate = DateTime.Now.DayOfWeek + day;
-                shutDateNum= DateTime.Now;
-                shutDateNum = shutDateNum.AddDays(day);
-                while (shutDate > DayOfWeek.Saturday)
-                {
-                    shutDate -= 6;
-                }
-                File.WriteAllText("log", shutHr + ":" +
-                    shutMn + "," +
-                    shutDate.ToString() + "-" +
-                    shutDateNum.ToString("MMMM d, yyyy"));
+
+                // Store the shutdown time in a standardized format
+                File.WriteAllText("log", shutdownTime.ToString("yyyy-MM-dd HH:mm:ss"));
+
                 CancelBtn.Enabled = true;
                 _ = LoadTimer();
             }
+
             MinuteBoard.Value = 0;
             HoursBoard.Value = 0;
         }
@@ -165,30 +185,63 @@ namespace Common_Tasks
         private void CancelBtn_Click(object sender, EventArgs e)
         {
             isShutdownCancelled = true;
-            taskTrayIcon.Text = "Common Tasks";
-            remTmLbl.Text = string.Empty;
-            MinuteBoard.Value = 0;
-            HoursBoard.Value = 0;
-            File.Delete("log");
-            remTmLbl.Text = String.Empty;
-            shtDwnTmLbl.Text = String.Empty;
-            ShutdownBtn.Enabled = true;
+            File.Delete("log"); // Delete log if it exists
             CancelBtn.Enabled = false;
-            ProcessStartInfo psi = new ProcessStartInfo
-            {
-                FileName = "shutdown",
-                Arguments = "/a",
-                CreateNoWindow = true,
-                UseShellExecute = false
-            };
+            ShutdownBtn.Enabled = true;
+            RestoreFormSize();
+            RestorePanelSize();
+            remTmLbl.Text = "Shutdown canceled.";
+            shtDwnTmLbl.Text =  string.Empty;
+            taskTrayIcon.Text = string.Empty;
+        }
 
-            Process process = new Process
+        private void AdjustLabelSize(Label label)
+        {
+            // Calculate the required size based on the label's content
+            using (Graphics g = label.CreateGraphics())
             {
-                StartInfo = psi
-            };
-            process.Start();
-            process.WaitForExit();
-            process.Dispose();
+                SizeF textSize = g.MeasureString(label.Text, label.Font, label.Width);
+                label.AutoSize = false; // Prevent automatic sizing
+                label.Width = (int)textSize.Width + 20; // Add some padding
+                label.Height = (int)textSize.Height + 20; // Add some padding
+            }
+        }
+
+        private void AdjustFormSize(Form form, Control control)
+        {
+            // Add padding around the form
+            int formPadding = 40;
+
+            // Ensure the form size accommodates the control
+            form.ClientSize = new Size(
+                Math.Max(form.ClientSize.Width, control.Right + formPadding),
+                Math.Max(form.ClientSize.Height, control.Bottom + formPadding)
+            );
+        }
+
+        private void RestoreFormSize()
+        {
+            // Restore the form size to its default value
+            this.ClientSize = defaultFormSize;
+            this.Location = defaultFormLocation;
+        }
+
+        private void AdjustPanelSize(Panel panel, Label label)
+        {
+            // Add padding around the panel
+            int panelPadding = 40;
+
+            // Ensure the panel size accommodates the label
+            panel.Size = new Size(
+                Math.Max(panel.Width, label.Width + panelPadding),
+                Math.Max(panel.Height, label.Height + panelPadding)
+            );
+        }
+
+        private void RestorePanelSize()
+        {
+            // Restore the panel size to its default value
+            timerPanel.Size = defaultPanelSize;
         }
 
         private void ClrEvntBtn_Click(object sender, EventArgs e)

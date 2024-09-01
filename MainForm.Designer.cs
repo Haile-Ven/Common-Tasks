@@ -206,7 +206,7 @@ namespace Common_Tasks
             timerPanel.Location = new System.Drawing.Point(2, 368);
             timerPanel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             timerPanel.Name = "timerPanel";
-            timerPanel.Size = new System.Drawing.Size(353, 97);
+            timerPanel.Size = new System.Drawing.Size(359, 97);
             timerPanel.TabIndex = 20;
             // 
             // taskTrayIcon
@@ -235,7 +235,7 @@ namespace Common_Tasks
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(367, 478);
+            ClientSize = new System.Drawing.Size(368, 478);
             Controls.Add(timerPanel);
             Controls.Add(pictureBox1);
             Controls.Add(groupBox1);
