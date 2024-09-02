@@ -15,12 +15,15 @@ namespace Common_Tasks
         private Size defaultFormSize;
         private Point defaultFormLocation;
         private Size defaultPanelSize;
+        private Size defaultLabelSize;
         public MainForm()
         {
             InitializeComponent();
             defaultFormSize = this.ClientSize;
             defaultFormLocation = this.Location;
             defaultPanelSize = timerPanel.Size;
+            defaultLabelSize = remTmLbl.Size;
+            taskTrayIcon.Text = "Common Tasks";
             _ = LoadTimer();
         }
 
@@ -99,8 +102,10 @@ namespace Common_Tasks
 
                     if (remainingTime <= TimeSpan.Zero)
                     {
-                        remTmLbl.Text = "Shutdown time reached.";
+                        remTmLbl.Text = string.Empty;
+                        shtDwnTmLbl.Text = string.Empty;
                         taskTrayIcon.Text = remTmLbl.Text;
+                        taskTrayIcon.Text = "Common Tasks";
                         File.Delete("log");
                         return;
                     }
@@ -137,7 +142,6 @@ namespace Common_Tasks
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in CalculateTime: {ex.Message}");
                 remTmLbl.Text = "Error calculating remaining time.";
                 AdjustLabelSize(remTmLbl);
                 AdjustPanelSize(timerPanel, remTmLbl);
@@ -149,7 +153,6 @@ namespace Common_Tasks
         private void ShutdownBtn_Click(object sender, EventArgs e)
         {
             isShutdownCancelled = false;
-
             decimal minutes = MinuteBoard.Value * 60;
             decimal hours = HoursBoard.Value * 3600;
             decimal totalSeconds = minutes + hours;
@@ -190,9 +193,18 @@ namespace Common_Tasks
             ShutdownBtn.Enabled = true;
             RestoreFormSize();
             RestorePanelSize();
-            remTmLbl.Text = "Shutdown canceled.";
+            ProcessStartInfo psi = new ProcessStartInfo
+            {
+                FileName = "shutdown",
+                Arguments = "/a",
+                CreateNoWindow = true,
+                UseShellExecute = false
+            };
+            _ = Process.Start(psi);
+            MessageBox.Show("Shutdown canceled.","Canceled",MessageBoxButtons.OK,MessageBoxIcon.Information);
+            remTmLbl.Text = string.Empty;
             shtDwnTmLbl.Text =  string.Empty;
-            taskTrayIcon.Text = string.Empty;
+            taskTrayIcon.Text = "Common Tasks";
         }
 
         private void AdjustLabelSize(Label label)
@@ -242,6 +254,7 @@ namespace Common_Tasks
         {
             // Restore the panel size to its default value
             timerPanel.Size = defaultPanelSize;
+            remTmLbl.Size = defaultLabelSize;
         }
 
         private void ClrEvntBtn_Click(object sender, EventArgs e)
