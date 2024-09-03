@@ -305,6 +305,8 @@ namespace Common_Tasks
             WindowState = FormWindowState.Normal;
             ShowInTaskbar = true;
             taskTrayIcon.Visible = false;
+            RestoreFormSize();
+            RestorePanelSize();
         }
 
         private void taskTrayIcon_MouseClick(object sender, MouseEventArgs e)
