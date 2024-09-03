@@ -102,10 +102,8 @@ namespace Common_Tasks
 
                     if (remainingTime <= TimeSpan.Zero)
                     {
-                        remTmLbl.Text = string.Empty;
-                        shtDwnTmLbl.Text = string.Empty;
+                        remTmLbl.Text = "Shutdown time reached.";
                         taskTrayIcon.Text = remTmLbl.Text;
-                        taskTrayIcon.Text = "Common Tasks";
                         File.Delete("log");
                         return;
                     }
@@ -133,22 +131,21 @@ namespace Common_Tasks
                     remTmLbl.Text = remainingTimeString;
                     taskTrayIcon.Text = remainingTimeString;
 
-                    AdjustLabelSize(remTmLbl);
-                    AdjustPanelSize(timerPanel, remTmLbl);
-                    AdjustFormSize(this, timerPanel);
+                    // Adjust the label, panel, and form sizes
+                    AdjustPanelSizeIfLabelChanges(timerPanel, remTmLbl);
+                    AdjustFormSizeIfPanelChanges(this, timerPanel);
 
                     await Task.Delay(1000);
                 }
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Error in CalculateTime: {ex.Message}");
                 remTmLbl.Text = "Error calculating remaining time.";
-                AdjustLabelSize(remTmLbl);
-                AdjustPanelSize(timerPanel, remTmLbl);
-                AdjustFormSize(this,timerPanel);
+                AdjustPanelSizeIfLabelChanges(timerPanel, remTmLbl);
+                AdjustFormSizeIfPanelChanges(this, timerPanel);
             }
         }
-
 
         private void ShutdownBtn_Click(object sender, EventArgs e)
         {
@@ -207,27 +204,36 @@ namespace Common_Tasks
             taskTrayIcon.Text = "Common Tasks";
         }
 
-        private void AdjustLabelSize(Label label)
+        private void AdjustLabelForWordWrap(Label label, Panel panel)
         {
-            // Calculate the required size based on the label's content
-            using (Graphics g = label.CreateGraphics())
-            {
-                SizeF textSize = g.MeasureString(label.Text, label.Font, label.Width);
-                label.AutoSize = false; // Prevent automatic sizing
-                label.Width = (int)textSize.Width + 20; // Add some padding
-                label.Height = (int)textSize.Height + 20; // Add some padding
-            }
+            // Disable AutoSize to manually control the size of the label
+            label.AutoSize = false;
+
+            // Set the maximum width of the label to the width of the panel
+            label.MaximumSize = new Size(panel.Width, 0);
+
+            // Allow the label to adjust its height based on the wrapped text
+            label.Size = new Size(panel.Width, 0);
+
+            // Measure the required height for the current text with wrapping
+            Size size = TextRenderer.MeasureText(label.Text, label.Font, label.MaximumSize, TextFormatFlags.WordBreak);
+
+            // Update the label's size to fit the wrapped text
+            label.Height = size.Height;
         }
 
-        private void AdjustFormSize(Form form, Control control)
+        private void AdjustFormSizeIfPanelChanges(Form form, Panel panel)
         {
             // Add padding around the form
             int formPadding = 40;
 
-            // Ensure the form size accommodates the control
+            // Calculate the new height based on the panel's bottom position
+            int newHeight = panel.Bottom + formPadding;
+
+            // Only update the height of the form, keep the width unchanged
             form.ClientSize = new Size(
-                Math.Max(form.ClientSize.Width, control.Right + formPadding),
-                Math.Max(form.ClientSize.Height, control.Bottom + formPadding)
+                form.ClientSize.Width, // Keep the current width
+                Math.Max(form.ClientSize.Height, newHeight) // Adjust height based on panel
             );
         }
 
@@ -238,15 +244,21 @@ namespace Common_Tasks
             this.Location = defaultFormLocation;
         }
 
-        private void AdjustPanelSize(Panel panel, Label label)
+        private void AdjustPanelSizeIfLabelChanges(Panel panel, Label label)
         {
-            // Add padding around the panel
-            int panelPadding = 40;
+            // Adjust the label for word wrap within the panel
+            AdjustLabelForWordWrap(label, panel);
 
-            // Ensure the panel size accommodates the label
+            // Add padding around the panel
+            int panelPadding = 20;
+
+            // Calculate the new height based on the label's bottom position
+            int newHeight = label.Bottom + panelPadding;
+
+            // Only update the height of the panel, keep the width unchanged
             panel.Size = new Size(
-                Math.Max(panel.Width, label.Width + panelPadding),
-                Math.Max(panel.Height, label.Height + panelPadding)
+                panel.Width, // Keep the current width
+                Math.Max(panel.Height, newHeight) // Adjust height based on label
             );
         }
 

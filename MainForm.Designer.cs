@@ -169,11 +169,11 @@ namespace Common_Tasks
             // 
             // remTmLbl
             // 
-            remTmLbl.AutoSize = true;
             remTmLbl.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             remTmLbl.Location = new System.Drawing.Point(14, 66);
+            remTmLbl.MaximumSize = new System.Drawing.Size(295, 0);
             remTmLbl.Name = "remTmLbl";
-            remTmLbl.Size = new System.Drawing.Size(0, 18);
+            remTmLbl.Size = new System.Drawing.Size(290, 0);
             remTmLbl.TabIndex = 14;
             // 
             // shtDwnTmLbl
@@ -206,7 +206,7 @@ namespace Common_Tasks
             timerPanel.Location = new System.Drawing.Point(2, 368);
             timerPanel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             timerPanel.Name = "timerPanel";
-            timerPanel.Size = new System.Drawing.Size(359, 97);
+            timerPanel.Size = new System.Drawing.Size(315, 97);
             timerPanel.TabIndex = 20;
             // 
             // taskTrayIcon
@@ -235,7 +235,7 @@ namespace Common_Tasks
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(368, 478);
+            ClientSize = new System.Drawing.Size(328, 478);
             Controls.Add(timerPanel);
             Controls.Add(pictureBox1);
             Controls.Add(groupBox1);
