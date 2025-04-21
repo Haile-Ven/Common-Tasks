@@ -40,6 +40,7 @@ namespace Common_Tasks
             }
             catch (Exception ex)
             {
+                // Handle the exception without using toast notification
                 MessageBox.Show($"Error initializing toast notification: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -99,15 +100,18 @@ namespace Common_Tasks
                     return;
                 }
 
+                // Parse the log file content
                 string[] parts = fileContent.Split('|');
                 DateTime shutdownTime;
                 
                 if (parts.Length > 0)
                 {
+                    // Get the shutdown time (first part)
                     shutdownTime = DateTime.Parse(parts[0]);
                 }
                 else
                 {
+                    // Invalid format, delete the log file
                     File.Delete("log");
                     return;
                 }
@@ -141,6 +145,7 @@ namespace Common_Tasks
                 }
                 catch
                 {
+                    // Fallback to MessageBox if toast notification fails
                     MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
@@ -159,15 +164,18 @@ namespace Common_Tasks
 
                 string fileContent = File.ReadAllText("log");
                 
+                // Parse the log file content
                 string[] parts = fileContent.Split('|');
                 DateTime shutdownTime;
                 
                 if (parts.Length > 0)
                 {
+                    // Get the shutdown time (first part)
                     shutdownTime = DateTime.Parse(parts[0]);
                 }
                 else
                 {
+                    // Invalid format, delete the log file
                     File.Delete("log");
                     return;
                 }
@@ -223,6 +231,7 @@ namespace Common_Tasks
                 }
                 catch
                 {
+                    // Fallback to MessageBox if toast notification fails
                     MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
@@ -252,6 +261,7 @@ namespace Common_Tasks
 
                 _ = Process.Start(psi);
 
+                // Save both the shutdown time and the original scheduling time
                 string shutdownTimeStr = shutdownTime.ToString("yyyy-MM-dd HH:mm:ss");
                 string currentTimeStr = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                 File.WriteAllText("log", shutdownTimeStr + "|" + currentTimeStr);
@@ -285,14 +295,14 @@ namespace Common_Tasks
             }
             catch
             {
+                // Fallback to MessageBox if toast notification fails
                 MessageBox.Show("Shutdown canceled.", "Canceled", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
             }
             
             shutdownToastNotification.HideShutdownCountdown();
             
             remTmLbl.Text = string.Empty;
-            shtDwnTmLbl.Text = string.Empty;
+            shtDwnTmLbl.Text =  string.Empty;
             taskTrayIcon.Text = "Common Tasks";
         }
         static void DeleteFileIfExpired()
@@ -312,6 +322,7 @@ namespace Common_Tasks
                     return;
                 }
 
+                // Parse the log file content
                 string[] parts = dateLine.Split('|');
                 DateTime shutdownTime;
 
@@ -374,6 +385,7 @@ namespace Common_Tasks
                 }
                 catch
                 {
+                    // Fallback to MessageBox if toast notification fails
                     MessageBox.Show("File Error", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 ClrEvntBtn.Enabled = true;

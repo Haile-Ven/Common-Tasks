@@ -143,6 +143,7 @@ namespace Common_Tasks
             DateTime now = DateTime.Now;
             DateTime scheduledTime;
             
+            // Try to get the original scheduled time from the log file
             try
             {
                 string logContent = File.ReadAllText("log");
@@ -150,42 +151,54 @@ namespace Common_Tasks
                 
                 if (parts.Length > 1)
                 {
+                    // New format: shutdownTime|scheduledTime
                     scheduledTime = DateTime.Parse(parts[1]);
                 }
                 else
                 {
+                    // Old format or fallback: just use current time
                     scheduledTime = now;
                 }
             }
             catch
             {
+                // If there's any error, just use current time
                 scheduledTime = now;
             }
             
+            // Calculate the total duration from scheduled time until shutdown
             TimeSpan totalDuration = _shutdownTime - scheduledTime;
+            
+            // Store this as our reference for the progress indicator
             _totalDuration = totalDuration;
             
+            // Calculate initial progress percentage
             TimeSpan elapsedTime = now - scheduledTime;
             _progressPercentage = 1.0f - (float)(elapsedTime.TotalSeconds / totalDuration.TotalSeconds);
             
+            // Ensure percentage is within valid range
             if (_progressPercentage > 1.0f)
                 _progressPercentage = 1.0f;
             if (_progressPercentage < 0.0f)
                 _progressPercentage = 0.0f;
 
+            // Update the UI
             _shutdownTimeLabel.Text = $"Shutdown at: {_shutdownTime.ToString("dddd, dd MMMM yyyy hh:mm tt")}";
             _shutdownTimeLabel.MaximumSize = new Size(this.Width - 80, 0);
             _shutdownTimeLabel.AutoSize = true;
 
+            // Make sure the control is visible
             this.Visible = true;
             this.BringToFront();
             _isVisible = true;
 
+            // Start the timer if it's not already running
             if (!_updateTimer.Enabled)
             {
                 _updateTimer.Start();
             }
 
+            // Force a complete redraw
             this.Invalidate();
         }
 
@@ -263,11 +276,12 @@ namespace Common_Tasks
                 _progressPercentage = 0.0f;
                 _updateTimer.Stop();
 
-                Invalidate();
+                Invalidate(); // Force complete redraw
                 return;
             }
 
 
+            // Try to get the original scheduled time from the log file
             try
             {
                 string logContent = File.ReadAllText("log");
@@ -275,22 +289,27 @@ namespace Common_Tasks
                 
                 if (parts.Length > 1)
                 {
+                    // New format: shutdownTime|scheduledTime
                     DateTime scheduledTime = DateTime.Parse(parts[1]);
                     TimeSpan totalDuration = _shutdownTime - scheduledTime;
                     TimeSpan elapsedTime = DateTime.Now - scheduledTime;
                     
+                    // Calculate progress percentage (1.0 - elapsed/total)
                     _progressPercentage = 1.0f - (float)(elapsedTime.TotalSeconds / totalDuration.TotalSeconds);
                 }
                 else
                 {
+                    // Old format or fallback: use remaining time / total duration
                     _progressPercentage = (float)(remainingTime.TotalSeconds / _totalDuration.TotalSeconds);
                 }
             }
             catch
             {
+                // If there's any error, use remaining time / total duration
                 _progressPercentage = (float)(remainingTime.TotalSeconds / _totalDuration.TotalSeconds);
             }
             
+            // Ensure percentage is within valid range
             if (_progressPercentage > 1.0f)
                 _progressPercentage = 1.0f;
             if (_progressPercentage < 0.0f)
