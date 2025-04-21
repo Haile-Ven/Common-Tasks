@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -24,6 +25,7 @@ namespace Common_Tasks
             defaultPanelSize = timerPanel.Size;
             defaultLabelSize = remTmLbl.Size;
             taskTrayIcon.Text = "Common Tasks";
+            DeleteFileIfExpired();
             _ = LoadTimer();
         }
 
@@ -173,6 +175,8 @@ namespace Common_Tasks
 
                 // Store the shutdown time in a standardized format
                 File.WriteAllText("log", shutdownTime.ToString("yyyy-MM-dd HH:mm:ss"));
+                
+                //Restrict access
 
                 CancelBtn.Enabled = true;
                 _ = LoadTimer();
@@ -202,6 +206,45 @@ namespace Common_Tasks
             remTmLbl.Text = string.Empty;
             shtDwnTmLbl.Text =  string.Empty;
             taskTrayIcon.Text = "Common Tasks";
+        }
+        static void DeleteFileIfExpired()
+        {
+            try
+            {
+                if (!File.Exists("log"))
+                {
+                    Console.WriteLine("File does not exist.");
+                    return;
+                }
+
+                // Read the shutdown time from the log file
+                string dateLine = File.ReadLines("log").FirstOrDefault();
+
+                if (DateTime.TryParse(dateLine, out DateTime shutdownTime))
+                {
+                    DateTime currentTime = DateTime.Now;
+
+                    // Only delete the log file if the shutdown time has passed
+                    // This properly handles day turnovers and future scheduled shutdowns
+                    if (currentTime > shutdownTime)
+                    {
+                        Console.WriteLine("Shutdown time has passed. Deleting log file.");
+                        File.Delete("log");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Shutdown is still scheduled for the future.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Could not parse the shutdown time from the log file.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in DeleteFileIfExpired: {ex.Message}");
+            }
         }
 
         private void AdjustLabelForWordWrap(Label label, Panel panel)

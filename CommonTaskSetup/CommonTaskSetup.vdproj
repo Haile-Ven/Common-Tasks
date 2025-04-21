@@ -1,4 +1,4 @@
-﻿"DeployProject"
+"DeployProject"
 {
 "VSVersion" = "3:800"
 "ProjectType" = "8:{978C614F-708E-4E1A-B201-565925725DBA}"
@@ -206,7 +206,7 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Common Tasks"
-        "ProductCode" = "8:{177F6579-B2FF-4E78-A625-D092671E7EA0}"
+        "ProductCode" = "8:{177F6579-B2FF-4E78-A625-D092671E7EA1}"
         "PackageCode" = "8:{EDA798A2-1D5A-44F2-B979-C1A282F0679C}"
         "UpgradeCode" = "8:{8231E94B-C4BC-415C-ABAD-E1E09A530AAD}"
         "AspNetVersion" = "8:4.0.30319.0"
@@ -214,7 +214,7 @@
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:2.0.1"
+        "ProductVersion" = "8:2.0.2"
         "Manufacturer" = "8:Ven"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
