@@ -33,8 +33,15 @@ namespace Common_Tasks
             DeleteFileIfExpired();
             _ = LoadTimer();
             
-            toastNotification = new ToastNotification();
-            toastNotification.AttachToForm(this);
+            try
+            {
+                toastNotification = new ToastNotification();
+                toastNotification.AttachToForm(this);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error initializing toast notification: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void ExitItem_Click(object sender, EventArgs e)
@@ -88,12 +95,22 @@ namespace Common_Tasks
                 string fileContent = File.ReadAllText("log");
                 if (string.IsNullOrEmpty(fileContent))
                 {
-
                     File.Delete("log");
                     return;
                 }
 
-                DateTime shutdownTime = DateTime.Parse(fileContent);
+                string[] parts = fileContent.Split('|');
+                DateTime shutdownTime;
+                
+                if (parts.Length > 0)
+                {
+                    shutdownTime = DateTime.Parse(parts[0]);
+                }
+                else
+                {
+                    File.Delete("log");
+                    return;
+                }
 
 
                 if (shutdownTime <= DateTime.Now)
@@ -118,7 +135,14 @@ namespace Common_Tasks
             }
             catch (Exception ex)
             {
-                toastNotification.Show($"Error: {ex.Message}", "ERROR", false);
+                try
+                {
+                    toastNotification.Show($"Error: {ex.Message}", "ERROR", false);
+                }
+                catch
+                {
+                    MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -134,7 +158,19 @@ namespace Common_Tasks
                 }
 
                 string fileContent = File.ReadAllText("log");
-                DateTime shutdownTime = DateTime.Parse(fileContent);
+                
+                string[] parts = fileContent.Split('|');
+                DateTime shutdownTime;
+                
+                if (parts.Length > 0)
+                {
+                    shutdownTime = DateTime.Parse(parts[0]);
+                }
+                else
+                {
+                    File.Delete("log");
+                    return;
+                }
 
                 while (true)
                 {
@@ -181,7 +217,14 @@ namespace Common_Tasks
             }
             catch (Exception ex)
             {
-                toastNotification.Show($"Error: {ex.Message}", "ERROR", false);
+                try
+                {
+                    toastNotification.Show($"Error: {ex.Message}", "ERROR", false);
+                }
+                catch
+                {
+                    MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -209,7 +252,9 @@ namespace Common_Tasks
 
                 _ = Process.Start(psi);
 
-                File.WriteAllText("log", shutdownTime.ToString("yyyy-MM-dd HH:mm:ss"));
+                string shutdownTimeStr = shutdownTime.ToString("yyyy-MM-dd HH:mm:ss");
+                string currentTimeStr = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                File.WriteAllText("log", shutdownTimeStr + "|" + currentTimeStr);
                 
                 CancelBtn.Enabled = true;
                 _ = LoadTimer();
@@ -234,12 +279,20 @@ namespace Common_Tasks
                 UseShellExecute = false
             };
             _ = Process.Start(psi);
-            toastNotification.Show("Shutdown canceled.", "CANCELED", true);
+            try
+            {
+                toastNotification.Show("Shutdown canceled.", "CANCELED", true);
+            }
+            catch
+            {
+                MessageBox.Show("Shutdown canceled.", "Canceled", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            }
             
             shutdownToastNotification.HideShutdownCountdown();
             
             remTmLbl.Text = string.Empty;
-            shtDwnTmLbl.Text =  string.Empty;
+            shtDwnTmLbl.Text = string.Empty;
             taskTrayIcon.Text = "Common Tasks";
         }
         static void DeleteFileIfExpired()
@@ -253,7 +306,16 @@ namespace Common_Tasks
 
                 string dateLine = File.ReadLines("log").FirstOrDefault();
 
-                if (DateTime.TryParse(dateLine, out DateTime shutdownTime))
+                if (string.IsNullOrEmpty(dateLine))
+                {
+                    File.Delete("log");
+                    return;
+                }
+
+                string[] parts = dateLine.Split('|');
+                DateTime shutdownTime;
+
+                if (parts.Length > 0 && DateTime.TryParse(parts[0], out shutdownTime))
                 {
                     DateTime currentTime = DateTime.Now;
 
@@ -270,15 +332,6 @@ namespace Common_Tasks
             catch (Exception ex)
             {
             }
-        }
-
-        private void AdjustLabelForWordWrap(Label label, Panel panel)
-        {
-            label.AutoSize = false;
-            label.MaximumSize = new Size(panel.Width, 0);
-            label.Size = new Size(panel.Width, 0);
-            Size size = TextRenderer.MeasureText(label.Text, label.Font, label.MaximumSize, TextFormatFlags.WordBreak);
-            label.Height = size.Height;
         }
 
         private void RestoreFormSize()
@@ -315,7 +368,14 @@ namespace Common_Tasks
             }
             catch
             {
-                toastNotification.Show("File Error", "ERROR", false);
+                try
+                {
+                    toastNotification.Show("File Error", "ERROR", false);
+                }
+                catch
+                {
+                    MessageBox.Show("File Error", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
                 ClrEvntBtn.Enabled = true;
             }
         }

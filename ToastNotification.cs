@@ -29,7 +29,6 @@ namespace SelfSampleProRAD_DB.UserControls
             };
         }
 
-
         public void AttachToForm(Form parentForm)
         {
             _parentForm = parentForm;
@@ -40,7 +39,6 @@ namespace SelfSampleProRAD_DB.UserControls
                 _parentForm.Controls.Add(this);
             }
 
-
             _parentForm.Resize += (s, e) => {
                 if (Visible)
                 {
@@ -48,7 +46,6 @@ namespace SelfSampleProRAD_DB.UserControls
                 }
             };
         }
-
 
         private void PositionNotification()
         {
@@ -73,23 +70,14 @@ namespace SelfSampleProRAD_DB.UserControls
 
             titleLabel.Text = title;
             messageLabel.Text = message;
-            
-
             messageLabel.MaximumSize = new Size(190, 0);
             messageLabel.AutoSize = true;
 
-
             _isErrorStyle = !isSuccess;
             UpdateStyle();
-
-
             PositionNotification();
-
-
             BringToFront();
             Visible = true;
-
-
             _notificationTimer.Start();
         }
 
@@ -118,7 +106,6 @@ namespace SelfSampleProRAD_DB.UserControls
                 g.SmoothingMode = SmoothingMode.AntiAlias;
                 using (Pen pen = new Pen(Color.FromArgb(76, 175, 80), 3))
                 {
-
                     g.DrawLines(pen, new Point[] {
                         new Point(5, 12),
                         new Point(10, 17),
@@ -139,7 +126,6 @@ namespace SelfSampleProRAD_DB.UserControls
                 g.SmoothingMode = SmoothingMode.AntiAlias;
                 using (Pen pen = new Pen(Color.FromArgb(255, 99, 71), 3))
                 {
-
                     g.DrawLine(pen, 6, 6, 18, 18);
                     g.DrawLine(pen, 6, 18, 18, 6);
                 }
@@ -159,7 +145,6 @@ namespace SelfSampleProRAD_DB.UserControls
             {
                 e.Graphics.FillRectangle(brush, 0, 0, 5, Height);
             }
-
 
             using (Pen pen = new Pen(Color.FromArgb(230, 230, 230)))
             {

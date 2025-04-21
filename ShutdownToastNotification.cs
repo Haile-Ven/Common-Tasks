@@ -140,83 +140,53 @@ namespace Common_Tasks
         public void ShowShutdownCountdown(DateTime shutdownTime)
         {
             _shutdownTime = shutdownTime;
-            
-
             DateTime now = DateTime.Now;
+            DateTime scheduledTime;
             
-            // Calculate remaining time
-            TimeSpan remainingTime = _shutdownTime - now;
-            
-            if (remainingTime.TotalSeconds > 0)
+            try
             {
-
-                bool isNewShutdown = false;
-                try
-                {
-
-                    if (File.Exists("log"))
-                    {
-                        FileInfo fileInfo = new FileInfo("log");
-
-                        isNewShutdown = (DateTime.Now - fileInfo.CreationTime).TotalSeconds < 5;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    isNewShutdown = true;
-                }
+                string logContent = File.ReadAllText("log");
+                string[] parts = logContent.Split('|');
                 
-
-                if (isNewShutdown)
+                if (parts.Length > 1)
                 {
-                    _totalDuration = remainingTime;
-                    _progressPercentage = 1.0f; // Start at 100%
+                    scheduledTime = DateTime.Parse(parts[1]);
                 }
                 else
                 {
-
-                    TimeSpan originalDuration = TimeSpan.FromMinutes(60); // Assume a default duration
-                    
-
-                    TimeSpan elapsedSinceScheduled = _shutdownTime - now;
-                    
-
-                    _totalDuration = originalDuration;
-                    _progressPercentage = (float)(remainingTime.TotalMilliseconds / originalDuration.TotalMilliseconds);
-                    
-
-                    if (_progressPercentage > 1.0f) _progressPercentage = 1.0f;
-                    if (_progressPercentage < 0.0f) _progressPercentage = 0.0f;
-                    
-
+                    scheduledTime = now;
                 }
-               
             }
-            else
+            catch
             {
-
-                _progressPercentage = 0.0f;
-                _totalDuration = TimeSpan.Zero;
-
+                scheduledTime = now;
             }
+            
+            TimeSpan totalDuration = _shutdownTime - scheduledTime;
+            _totalDuration = totalDuration;
+            
+            TimeSpan elapsedTime = now - scheduledTime;
+            _progressPercentage = 1.0f - (float)(elapsedTime.TotalSeconds / totalDuration.TotalSeconds);
+            
+            if (_progressPercentage > 1.0f)
+                _progressPercentage = 1.0f;
+            if (_progressPercentage < 0.0f)
+                _progressPercentage = 0.0f;
 
             _shutdownTimeLabel.Text = $"Shutdown at: {_shutdownTime.ToString("dddd, dd MMMM yyyy hh:mm tt")}";
-            _shutdownTimeLabel.MaximumSize = new Size(Width - 80, 0);
+            _shutdownTimeLabel.MaximumSize = new Size(this.Width - 80, 0);
             _shutdownTimeLabel.AutoSize = true;
 
-            Visible = true;
-            BringToFront();
+            this.Visible = true;
+            this.BringToFront();
             _isVisible = true;
-
 
             if (!_updateTimer.Enabled)
             {
                 _updateTimer.Start();
-
             }
 
-            // Force a complete redraw
-            Invalidate();
+            this.Invalidate();
         }
 
 
@@ -243,16 +213,17 @@ namespace Common_Tasks
                     return;
                 }
                 
-
                 string fileContent = File.ReadAllText("log");
                 if (string.IsNullOrEmpty(fileContent))
                 {
-
                     return;
                 }
                 
-
-                if (DateTime.TryParse(fileContent, out DateTime shutdownTime))
+                // Parse the log file content
+                string[] parts = fileContent.Split('|');
+                DateTime shutdownTime;
+                
+                if (parts.Length > 0 && DateTime.TryParse(parts[0], out shutdownTime))
                 {
 
                     if (shutdownTime > DateTime.Now)
@@ -264,14 +235,6 @@ namespace Common_Tasks
                         BringToFront();
                         ShowShutdownCountdown(shutdownTime);
                     }
-                    else
-                    {
-
-                    }
-                }
-                else
-                {
-
                 }
             }
             catch (Exception ex)
@@ -300,16 +263,38 @@ namespace Common_Tasks
                 _progressPercentage = 0.0f;
                 _updateTimer.Stop();
 
-                Invalidate(); // Force complete redraw
+                Invalidate();
                 return;
             }
 
 
-            _progressPercentage = (float)(remainingTime.TotalMilliseconds / _totalDuration.TotalMilliseconds);
+            try
+            {
+                string logContent = File.ReadAllText("log");
+                string[] parts = logContent.Split('|');
+                
+                if (parts.Length > 1)
+                {
+                    DateTime scheduledTime = DateTime.Parse(parts[1]);
+                    TimeSpan totalDuration = _shutdownTime - scheduledTime;
+                    TimeSpan elapsedTime = DateTime.Now - scheduledTime;
+                    
+                    _progressPercentage = 1.0f - (float)(elapsedTime.TotalSeconds / totalDuration.TotalSeconds);
+                }
+                else
+                {
+                    _progressPercentage = (float)(remainingTime.TotalSeconds / _totalDuration.TotalSeconds);
+                }
+            }
+            catch
+            {
+                _progressPercentage = (float)(remainingTime.TotalSeconds / _totalDuration.TotalSeconds);
+            }
             
-
-            if (_progressPercentage > 1.0f) _progressPercentage = 1.0f;
-            if (_progressPercentage < 0.0f) _progressPercentage = 0.0f;
+            if (_progressPercentage > 1.0f)
+                _progressPercentage = 1.0f;
+            if (_progressPercentage < 0.0f)
+                _progressPercentage = 0.0f;
             
 
 
@@ -383,20 +368,16 @@ namespace Common_Tasks
 
                 float sweepAngle = 360 * _progressPercentage;
 
-
                 int progressRadius = radius - 1;
-
 
                 using (GraphicsPath path = new GraphicsPath())
                 {
-
                     path.AddArc(centerX - progressRadius, centerY - progressRadius, progressRadius * 2, progressRadius * 2, -90, sweepAngle);
 
                     path.AddLine(centerX + (float)(progressRadius * Math.Cos((sweepAngle - 90) * Math.PI / 180)),
                                  centerY + (float)(progressRadius * Math.Sin((sweepAngle - 90) * Math.PI / 180)),
                                  centerX, centerY);
                     path.AddLine(centerX, centerY, centerX, centerY - progressRadius);
-
 
                     using (SolidBrush progressBrush = new SolidBrush(_progressColor))
                     {
@@ -410,8 +391,6 @@ namespace Common_Tasks
         {
 
             _progressLocation = new Point(10, 25);
-            
-
             _timeRemainingLabel.MaximumSize = new Size(Width - 80, 0);
             _shutdownTimeLabel.MaximumSize = new Size(Width - 80, 0);
         }
