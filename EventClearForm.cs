@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using SelfSampleProRAD_DB.UserControls;
 
 namespace Common_Tasks
 {
@@ -11,10 +12,15 @@ namespace Common_Tasks
     {
         int errCount = 0, outCount = 0, totalEvent = 0;
         bool canClose = false;
+        private ToastNotification toastNotification;
 
         public EventClearForm()
         {
             InitializeComponent();
+            
+            // Initialize and attach toast notification
+            toastNotification = new ToastNotification();
+            toastNotification.AttachToForm(this);
             _ = LoadFormAsync();
         }
 
@@ -29,7 +35,7 @@ namespace Common_Tasks
             }
             catch (System.ComponentModel.Win32Exception)
             {
-                MessageBox.Show("Run program as an Administrator!!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                toastNotification.Show("Run program as an Administrator!!", "WARNING", false);
             }
         }
 
@@ -163,7 +169,7 @@ namespace Common_Tasks
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, ex.ToString(), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                toastNotification.Show(ex.Message, "ERROR", false);
             }
         }
     }

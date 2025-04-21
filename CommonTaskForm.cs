@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -10,14 +10,21 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using Microsoft.Win32;
 using System.IO;
+using SelfSampleProRAD_DB.UserControls;
 
 namespace Common_Tasks
 {
     public partial class common_taskForm : Form
     {
+        private ToastNotification toastNotification;
+
         public common_taskForm()
         {
             InitializeComponent();
+
+            // Initialize and attach toast notification
+            toastNotification = new ToastNotification();
+            toastNotification.AttachToForm(this);
         }
 
         private void shutdownBtn_Click(object sender, EventArgs e)
@@ -53,7 +60,7 @@ namespace Common_Tasks
                 //promptLbl.Text = "Event viewer clear !";
                 clrEvntBtn.Enabled = false;
             }
-            catch(System.ComponentModel.Win32Exception) { MessageBox.Show("Run program as an Administrator!!","Warning", MessageBoxButtons.OK, MessageBoxIcon.Error); };
+            catch(System.ComponentModel.Win32Exception) { toastNotification.Show("Run program as an Administrator!!", "WARNING", false); };
         }
 
         private void resetToolStripMenuItem_Click(object sender, EventArgs e)

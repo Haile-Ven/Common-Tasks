@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using SelfSampleProRAD_DB.UserControls;
 
 namespace Common_Tasks
 {
@@ -14,6 +15,8 @@ namespace Common_Tasks
         public event Action EventClearFormClosed;
         private bool isShutdownCancelled = false;
         private Size defaultFormSize;
+        private ToastNotification toastNotification;
+        private ShutdownToastNotification shutdownToastNotification;
         private Point defaultFormLocation;
         private Size defaultPanelSize;
         private Size defaultLabelSize;
@@ -27,6 +30,19 @@ namespace Common_Tasks
             taskTrayIcon.Text = "Common Tasks";
             DeleteFileIfExpired();
             _ = LoadTimer();
+            
+            // Initialize and attach toast notification
+            toastNotification = new ToastNotification();
+            toastNotification.AttachToForm(this);
+            
+            // Initialize shutdown toast notification and add it to timerPanel
+            shutdownToastNotification = new ShutdownToastNotification();
+            shutdownToastNotification.Size = timerPanel.Size;
+            timerPanel.Controls.Clear(); // Remove existing controls from timerPanel
+            timerPanel.Controls.Add(shutdownToastNotification);
+            shutdownToastNotification.Dock = DockStyle.Fill;
+            shutdownToastNotification.BringToFront();
+            shutdownToastNotification.Visible = false; // Hide until shutdown button is clicked
         }
 
         private void ExitItem_Click(object sender, EventArgs e)
@@ -57,25 +73,33 @@ namespace Common_Tasks
 
         private async Task LoadTimer()
         {
-            if (File.Exists("log"))
+            try
             {
-                // Read the shutdown time from the log file
+                if (!File.Exists("log"))
+                {
+                    return;
+                }
+
                 string fileContent = File.ReadAllText("log");
                 DateTime shutdownTime = DateTime.Parse(fileContent);
 
                 // Convert to desired display format: "dddd, dd MMMM yyyy hh:mm tt"
                 string formattedShutdownTime = shutdownTime.ToString("dddd, dd MMMM yyyy hh:mm tt");
 
-                // Display the formatted shutdown time
-                shtDwnTmLbl.Text = $"Windows will shutdown on\n{formattedShutdownTime}";
+                // Clear the existing labels since we're using ShutdownToastNotification
+                shtDwnTmLbl.Text = string.Empty;
+                remTmLbl.Text = string.Empty;
                 ShutdownBtn.Enabled = false;
                 CancelBtn.Enabled = true;
 
+                // Show the shutdown toast notification with countdown
+                shutdownToastNotification.ShowShutdownCountdown(shutdownTime);
+
                 await CalculateTime();
             }
-            else
+            catch (Exception ex)
             {
-                CancelBtn.Enabled = false;
+                toastNotification.Show($"Error: {ex.Message}", "ERROR", false);
             }
         }
 
@@ -86,6 +110,7 @@ namespace Common_Tasks
                 if (isShutdownCancelled)
                 {
                     File.Delete("log");
+                    shutdownToastNotification.HideShutdownCountdown();
                     return;
                 }
 
@@ -97,6 +122,7 @@ namespace Common_Tasks
                     if (isShutdownCancelled)
                     {
                         File.Delete("log");
+                        shutdownToastNotification.HideShutdownCountdown();
                         return; // Exit the method when canceled
                     }
 
@@ -104,8 +130,7 @@ namespace Common_Tasks
 
                     if (remainingTime <= TimeSpan.Zero)
                     {
-                        remTmLbl.Text = "Shutdown time reached.";
-                        taskTrayIcon.Text = remTmLbl.Text;
+                        taskTrayIcon.Text = "Shutdown time reached.";
                         File.Delete("log");
                         return;
                     }
@@ -130,22 +155,17 @@ namespace Common_Tasks
                                               $"{remainingSeconds} second{(remainingSeconds > 1 ? "s" : "")} remaining.";
                     }
 
-                    remTmLbl.Text = remainingTimeString;
                     taskTrayIcon.Text = remainingTimeString;
 
-                    // Adjust the label, panel, and form sizes
-                    AdjustPanelSizeIfLabelChanges(timerPanel, remTmLbl);
-                    AdjustFormSizeIfPanelChanges(this, timerPanel);
+                    // Note: We don't need to update the shutdown toast notification here
+                    // as it has its own timer that updates the UI
 
                     await Task.Delay(1000);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in CalculateTime: {ex.Message}");
-                remTmLbl.Text = "Error calculating remaining time.";
-                AdjustPanelSizeIfLabelChanges(timerPanel, remTmLbl);
-                AdjustFormSizeIfPanelChanges(this, timerPanel);
+                toastNotification.Show($"Error: {ex.Message}", "ERROR", false);
             }
         }
 
@@ -192,8 +212,8 @@ namespace Common_Tasks
             File.Delete("log"); // Delete log if it exists
             CancelBtn.Enabled = false;
             ShutdownBtn.Enabled = true;
-            RestoreFormSize();
-            RestorePanelSize();
+            
+            // Cancel the shutdown command
             ProcessStartInfo psi = new ProcessStartInfo
             {
                 FileName = "shutdown",
@@ -202,7 +222,11 @@ namespace Common_Tasks
                 UseShellExecute = false
             };
             _ = Process.Start(psi);
-            MessageBox.Show("Shutdown canceled.","Canceled",MessageBoxButtons.OK,MessageBoxIcon.Information);
+            toastNotification.Show("Shutdown canceled.", "CANCELED", true);
+            
+            // Hide the shutdown toast notification
+            shutdownToastNotification.HideShutdownCountdown();
+            
             remTmLbl.Text = string.Empty;
             shtDwnTmLbl.Text =  string.Empty;
             taskTrayIcon.Text = "Common Tasks";
@@ -213,7 +237,6 @@ namespace Common_Tasks
             {
                 if (!File.Exists("log"))
                 {
-                    Console.WriteLine("File does not exist.");
                     return;
                 }
 
@@ -228,22 +251,21 @@ namespace Common_Tasks
                     // This properly handles day turnovers and future scheduled shutdowns
                     if (currentTime > shutdownTime)
                     {
-                        Console.WriteLine("Shutdown time has passed. Deleting log file.");
                         File.Delete("log");
                     }
                     else
                     {
-                        Console.WriteLine("Shutdown is still scheduled for the future.");
+                        // Could not parse the shutdown time
                     }
                 }
                 else
                 {
-                    Console.WriteLine("Could not parse the shutdown time from the log file.");
+                    // Could not parse the shutdown time
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in DeleteFileIfExpired: {ex.Message}");
+                // Error in DeleteFileIfExpired
             }
         }
 
@@ -282,9 +304,10 @@ namespace Common_Tasks
 
         private void RestoreFormSize()
         {
-            // Restore the form size to its default value
+            // Restore the form size to its default value, but keep the current location
+            Point currentLocation = this.Location;
             this.ClientSize = defaultFormSize;
-            this.Location = defaultFormLocation;
+            this.Location = currentLocation; // Keep the current position
         }
 
         private void AdjustPanelSizeIfLabelChanges(Panel panel, Label label)
@@ -332,7 +355,7 @@ namespace Common_Tasks
             }
             catch
             {
-                MessageBox.Show("ERROR!", "File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                toastNotification.Show("File Error", "ERROR", false);
                 ClrEvntBtn.Enabled = true;
             }
         }
