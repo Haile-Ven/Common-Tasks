@@ -2,14 +2,11 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using System.Drawing.Imaging;
-using System.Reflection;
+using System.IO;
 
 namespace Common_Tasks
 {
-    /// <summary>
-    /// A custom toast notification control for displaying shutdown countdown with a circular progress indicator
-    /// </summary>
+
     public partial class ShutdownToastNotification : UserControl
     {
         private Timer _updateTimer;
@@ -31,24 +28,18 @@ namespace Common_Tasks
         private Label _shutdownTimeLabel;
 
         // Progress indicator properties
-        private int _progressSize = 40;
-        private Point _progressLocation = new Point(260, 25);
+        private int _progressSize = 50;
+        private Point _progressLocation = new Point(10, 25);
 
-        /// <summary>
-        /// Creates a new shutdown toast notification control
-        /// </summary>
         public ShutdownToastNotification()
         {
             InitializeComponent();
-            this.BackColor = Color.Transparent;
-            this.Visible = true;
-
-            // Set double buffering to prevent flickering and enable transparency
-            this.SetStyle(ControlStyles.OptimizedDoubleBuffer | 
+            BackColor = Color.Transparent;
+            SetStyle(ControlStyles.OptimizedDoubleBuffer | 
                           ControlStyles.AllPaintingInWmPaint | 
                           ControlStyles.UserPaint | 
                           ControlStyles.SupportsTransparentBackColor, true);
-            this.UpdateStyles();
+            UpdateStyles();
 
             // Create update timer with higher frequency for smoother animation
             _updateTimer = new Timer
@@ -56,63 +47,64 @@ namespace Common_Tasks
                 Interval = 1000
             };
             _updateTimer.Tick += UpdateTimer_Tick;
+            
+            // Check if there's a scheduled shutdown on load
+            CheckForScheduledShutdown();
         }
 
         private void InitializeComponent()
         {
-            // Configure the control
-            this.Size = new Size(315, 97); // Match timerPanel size
-            this.BackColor = Color.Transparent;
-            this.BorderStyle = BorderStyle.None;
-            
-            // Create title label
-            _titleLabel = new Label
-            {
-                Text = "Shutdown Scheduled",
-                Font = new Font("Segoe UI", 8, FontStyle.Bold),
-                ForeColor = _titleColor,
-                AutoSize = true,
-                Location = new Point(5, 5)
-            };
-
-            // Create time remaining label
-            _timeRemainingLabel = new Label
-            {
-                Text = "Shutdown Scheduled",
-                Font = new Font("Segoe UI", 8),
-                ForeColor = _textColor,
-                AutoSize = true,
-                Location = new Point(5, 25)
-            };
-
-            // Create shutdown time label
-            _shutdownTimeLabel = new Label
-            {
-                Text = "Shutdown time: ",
-                Font = new Font("Segoe UI", 8),
-                ForeColor = _textColor,
-                AutoSize = true,
-                Location = new Point(5, 45)
-            };
-
-            // No progress panel needed - we'll draw directly on the form
-
-            // No close button as per user request
-
-            // Add controls
-            this.Controls.Add(_titleLabel);
-            this.Controls.Add(_timeRemainingLabel);
-            this.Controls.Add(_shutdownTimeLabel);
-
-            // Set up event handlers
-            this.Paint += ShutdownToastNotification_Paint;
-            this.Resize += ShutdownToastNotification_Resize;
+            _titleLabel = new Label();
+            _timeRemainingLabel = new Label();
+            _shutdownTimeLabel = new Label();
+            SuspendLayout();
+            // 
+            // _titleLabel
+            // 
+            _titleLabel.AutoSize = true;
+            _titleLabel.Font = new Font("Segoe UI", 8, FontStyle.Bold);
+            _titleLabel.ForeColor = _titleColor;
+            _titleLabel.Location = new Point(70, 5);
+            _titleLabel.Name = "_titleLabel";
+            _titleLabel.Size = new Size(58, 32);
+            _titleLabel.TabIndex = 0;
+            _titleLabel.Text = "Shutdown Scheduled";
+            // 
+            // _timeRemainingLabel
+            // 
+            _timeRemainingLabel.AutoSize = true;
+            _timeRemainingLabel.Font = new Font("Segoe UI", 8);
+            _timeRemainingLabel.ForeColor = _textColor;
+            _timeRemainingLabel.Location = new Point(70, 25);
+            _timeRemainingLabel.Name = "_timeRemainingLabel";
+            _timeRemainingLabel.Size = new Size(100, 23);
+            _timeRemainingLabel.TabIndex = 1;
+            _timeRemainingLabel.Text = "Time remaining: ";
+            // 
+            // _shutdownTimeLabel
+            // 
+            _shutdownTimeLabel.AutoSize = true;
+            _shutdownTimeLabel.Font = new Font("Segoe UI", 8);
+            _shutdownTimeLabel.ForeColor = _textColor;
+            _shutdownTimeLabel.Location = new Point(70, 65);
+            _shutdownTimeLabel.Name = "_shutdownTimeLabel";
+            _shutdownTimeLabel.Size = new Size(100, 23);
+            _shutdownTimeLabel.TabIndex = 2;
+            _shutdownTimeLabel.Text = "Shutdown at: ";
+            // 
+            // ShutdownToastNotification
+            // 
+            BackColor = Color.Transparent;
+            Controls.Add(_titleLabel);
+            Controls.Add(_timeRemainingLabel);
+            Controls.Add(_shutdownTimeLabel);
+            Name = "ShutdownToastNotification";
+            Size = new Size(315, 97);
+            Paint += ShutdownToastNotification_Paint;
+            Resize += ShutdownToastNotification_Resize;
+            ResumeLayout(false);
         }
 
-        /// <summary>
-        /// Attaches the notification to a parent form
-        /// </summary>
-        /// <param name="parentForm">The form that will display the notification</param>
         public void AttachToForm(Form parentForm)
         {
             _parentForm = parentForm;
@@ -126,91 +118,211 @@ namespace Common_Tasks
             // Handle form resize to reposition the notification
             _parentForm.Resize += (s, e) =>
             {
-                if (this.Visible)
+                if (Visible)
                 {
                     PositionNotification();
                 }
             };
         }
 
-        /// <summary>
-        /// Positions the notification at the bottom right corner of the form
-        /// </summary>
         private void PositionNotification()
         {
             if (_parentForm != null)
             {
                 // Position in the bottom right corner with some padding
-                this.Location = new Point(
-                    _parentForm.ClientSize.Width - this.Width - 20, // 20px from right
-                    _parentForm.ClientSize.Height - this.Height - 20); // 20px from bottom
+                Location = new Point(
+                    _parentForm.ClientSize.Width - Width - 20, // 20px from right
+                    _parentForm.ClientSize.Height - Height - 20); // 20px from bottom
             }
         }
 
-        /// <summary>
-        /// Shows the shutdown notification with countdown
-        /// </summary>
-        /// <param name="shutdownTime">The scheduled shutdown time</param>
+
         public void ShowShutdownCountdown(DateTime shutdownTime)
         {
             _shutdownTime = shutdownTime;
-            _totalDuration = _shutdownTime - DateTime.Now;
-            _progressPercentage = 1.0f;
+            DateTime now = DateTime.Now;
+            DateTime scheduledTime;
+            
+            // Try to get the original scheduled time from the log file
+            try
+            {
+                string logContent = File.ReadAllText("log");
+                string[] parts = logContent.Split('|');
+                
+                if (parts.Length > 1)
+                {
+                    // New format: shutdownTime|scheduledTime
+                    scheduledTime = DateTime.Parse(parts[1]);
+                }
+                else
+                {
+                    // Old format or fallback: just use current time
+                    scheduledTime = now;
+                }
+            }
+            catch
+            {
+                // If there's any error, just use current time
+                scheduledTime = now;
+            }
+            
+            // Calculate the total duration from scheduled time until shutdown
+            TimeSpan totalDuration = _shutdownTime - scheduledTime;
+            
+            // Store this as our reference for the progress indicator
+            _totalDuration = totalDuration;
+            
+            // Calculate initial progress percentage
+            TimeSpan elapsedTime = now - scheduledTime;
+            _progressPercentage = 1.0f - (float)(elapsedTime.TotalSeconds / totalDuration.TotalSeconds);
+            
+            // Ensure percentage is within valid range
+            if (_progressPercentage > 1.0f)
+                _progressPercentage = 1.0f;
+            if (_progressPercentage < 0.0f)
+                _progressPercentage = 0.0f;
 
-            // Update the shutdown time label
+            // Update the UI
             _shutdownTimeLabel.Text = $"Shutdown at: {_shutdownTime.ToString("dddd, dd MMMM yyyy hh:mm tt")}";
-            _shutdownTimeLabel.MaximumSize = new Size(this.Width - 70, 0);
+            _shutdownTimeLabel.MaximumSize = new Size(this.Width - 80, 0);
             _shutdownTimeLabel.AutoSize = true;
 
-            // Make sure control is visible
-            this.BringToFront();
+            // Make sure the control is visible
             this.Visible = true;
+            this.BringToFront();
             _isVisible = true;
 
-            // Start update timer
-            _updateTimer.Start();
+            // Start the timer if it's not already running
+            if (!_updateTimer.Enabled)
+            {
+                _updateTimer.Start();
+            }
 
-            // Invalidate just the area where the progress circle is drawn
-            this.Invalidate(new Rectangle(_progressLocation, new Size(_progressSize, _progressSize)));
+            // Force a complete redraw
+            this.Invalidate();
         }
 
-        /// <summary>
-        /// Hides the shutdown notification and stops the timer
-        /// </summary>
+
         public void HideShutdownCountdown()
         {
-            this.Visible = false;
+            Visible = false;
             _isVisible = false;
-            _updateTimer.Stop();
+            if (_updateTimer.Enabled)
+            {
+                _updateTimer.Stop();
+
+            }
+        }
+        
+
+        private void CheckForScheduledShutdown()
+        {
+            try
+            {
+
+                if (!File.Exists("log"))
+                {
+
+                    return;
+                }
+                
+                string fileContent = File.ReadAllText("log");
+                if (string.IsNullOrEmpty(fileContent))
+                {
+                    return;
+                }
+                
+                // Parse the log file content
+                string[] parts = fileContent.Split('|');
+                DateTime shutdownTime;
+                
+                if (parts.Length > 0 && DateTime.TryParse(parts[0], out shutdownTime))
+                {
+
+                    if (shutdownTime > DateTime.Now)
+                    {
+
+                        
+
+                        Visible = true;
+                        BringToFront();
+                        ShowShutdownCountdown(shutdownTime);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
 
         private void UpdateTimer_Tick(object sender, EventArgs e)
         {
-            if (!_isVisible) return;
 
+            if (!_isVisible || !Visible)
+            {
+
+                return;
+            }
+
+            // Calculate remaining time
             TimeSpan remainingTime = _shutdownTime - DateTime.Now;
 
-            // Check if shutdown time has been reached
+
+
             if (remainingTime <= TimeSpan.Zero)
             {
                 _timeRemainingLabel.Text = "Shutdown time reached.";
                 _progressPercentage = 0.0f;
                 _updateTimer.Stop();
-                this.Invalidate(new Rectangle(_progressLocation, new Size(_progressSize, _progressSize)));
+
+                Invalidate(); // Force complete redraw
                 return;
             }
 
-            // Calculate progress percentage with higher precision for smoother animation
-            _progressPercentage = (float)(remainingTime.TotalMilliseconds / _totalDuration.TotalMilliseconds);
-            if (_progressPercentage > 1.0f) _progressPercentage = 1.0f;
-            if (_progressPercentage < 0.0f) _progressPercentage = 0.0f;
 
-            // Only update the text display once per second to avoid flickering
+            // Try to get the original scheduled time from the log file
+            try
+            {
+                string logContent = File.ReadAllText("log");
+                string[] parts = logContent.Split('|');
+                
+                if (parts.Length > 1)
+                {
+                    // New format: shutdownTime|scheduledTime
+                    DateTime scheduledTime = DateTime.Parse(parts[1]);
+                    TimeSpan totalDuration = _shutdownTime - scheduledTime;
+                    TimeSpan elapsedTime = DateTime.Now - scheduledTime;
+                    
+                    // Calculate progress percentage (1.0 - elapsed/total)
+                    _progressPercentage = 1.0f - (float)(elapsedTime.TotalSeconds / totalDuration.TotalSeconds);
+                }
+                else
+                {
+                    // Old format or fallback: use remaining time / total duration
+                    _progressPercentage = (float)(remainingTime.TotalSeconds / _totalDuration.TotalSeconds);
+                }
+            }
+            catch
+            {
+                // If there's any error, use remaining time / total duration
+                _progressPercentage = (float)(remainingTime.TotalSeconds / _totalDuration.TotalSeconds);
+            }
+            
+            // Ensure percentage is within valid range
+            if (_progressPercentage > 1.0f)
+                _progressPercentage = 1.0f;
+            if (_progressPercentage < 0.0f)
+                _progressPercentage = 0.0f;
+            
+
+
+
             int tickCounter = 0;
             tickCounter = (tickCounter + 1) % 10;
             if (_updateTimer.Interval != 100 || tickCounter == 0)
             {
-                // Format remaining time
+
                 int remainingDays = remainingTime.Days;
                 int remainingHours = remainingTime.Hours;
                 int remainingMinutes = remainingTime.Minutes;
@@ -240,14 +352,14 @@ namespace Common_Tasks
                     remainingTimeString = $"{remainingSeconds} second{(remainingSeconds > 1 ? "s" : "")}";
                 }
 
-                // Update the label
+
                 _timeRemainingLabel.Text = $"Time remaining: {remainingTimeString}";
-                _timeRemainingLabel.MaximumSize = new Size(this.Width - 70, 0);
+                _timeRemainingLabel.MaximumSize = new Size(Width - 80, 0);
                 _timeRemainingLabel.AutoSize = true;
             }
 
-            // Invalidate just the area where the progress circle is drawn
-            this.Invalidate(new Rectangle(_progressLocation, new Size(_progressSize, _progressSize)));
+
+            Invalidate();
         }
 
         private void ShutdownToastNotification_Paint(object sender, PaintEventArgs e)
@@ -258,38 +370,34 @@ namespace Common_Tasks
             g.PixelOffsetMode = PixelOffsetMode.HighQuality;
             g.CompositingQuality = CompositingQuality.HighQuality;
 
-            // Calculate center and radius for the progress indicator
+
             int centerX = _progressLocation.X + (_progressSize / 2);
             int centerY = _progressLocation.Y + (_progressSize / 2);
             int radius = (_progressSize / 2) - 5;
 
-            // Draw background circle with anti-aliasing
+
             using (SolidBrush bgBrush = new SolidBrush(_backgroundColor))
             {
                 g.FillEllipse(bgBrush, centerX - radius, centerY - radius, radius * 2, radius * 2);
             }
 
-            // Draw progress arc with smoother edges
+
             if (_progressPercentage > 0)
             {
-                // Calculate the sweep angle based on progress percentage
+
                 float sweepAngle = 360 * _progressPercentage;
 
-                // Use a slightly smaller radius for the progress to create a border effect
                 int progressRadius = radius - 1;
 
-                // Create a path for the arc with smoother edges
                 using (GraphicsPath path = new GraphicsPath())
                 {
-                    // Add the arc to the path
                     path.AddArc(centerX - progressRadius, centerY - progressRadius, progressRadius * 2, progressRadius * 2, -90, sweepAngle);
-                    // Add lines to create a pie slice
+
                     path.AddLine(centerX + (float)(progressRadius * Math.Cos((sweepAngle - 90) * Math.PI / 180)),
                                  centerY + (float)(progressRadius * Math.Sin((sweepAngle - 90) * Math.PI / 180)),
                                  centerX, centerY);
                     path.AddLine(centerX, centerY, centerX, centerY - progressRadius);
 
-                    // Fill the path with anti-aliasing
                     using (SolidBrush progressBrush = new SolidBrush(_progressColor))
                     {
                         g.FillPath(progressBrush, path);
@@ -300,10 +408,12 @@ namespace Common_Tasks
 
         private void ShutdownToastNotification_Resize(object sender, EventArgs e)
         {
-            // Update progress location to stay in the top right
-            _progressLocation = new Point(this.Width - _progressSize - 10, 25);
+
+            _progressLocation = new Point(10, 25);
+            _timeRemainingLabel.MaximumSize = new Size(Width - 80, 0);
+            _shutdownTimeLabel.MaximumSize = new Size(Width - 80, 0);
         }
 
-        // Close button functionality removed as per user request
+
     }
 }

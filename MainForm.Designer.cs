@@ -95,7 +95,7 @@ namespace Common_Tasks
             groupBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             groupBox1.Name = "groupBox1";
             groupBox1.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            groupBox1.Size = new System.Drawing.Size(288, 165);
+            groupBox1.Size = new System.Drawing.Size(288, 146);
             groupBox1.TabIndex = 18;
             groupBox1.TabStop = false;
             groupBox1.Text = "Schedule Power Managment";
@@ -203,10 +203,10 @@ namespace Common_Tasks
             timerPanel.Controls.Add(remTmLbl);
             timerPanel.Controls.Add(shtDwnTmLbl);
             timerPanel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            timerPanel.Location = new System.Drawing.Point(2, 368);
+            timerPanel.Location = new System.Drawing.Point(2, 349);
             timerPanel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             timerPanel.Name = "timerPanel";
-            timerPanel.Size = new System.Drawing.Size(315, 126);
+            timerPanel.Size = new System.Drawing.Size(315, 135);
             timerPanel.TabIndex = 20;
             // 
             // taskTrayIcon
@@ -235,7 +235,7 @@ namespace Common_Tasks
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(328, 497);
+            ClientSize = new System.Drawing.Size(328, 504);
             Controls.Add(timerPanel);
             Controls.Add(pictureBox1);
             Controls.Add(groupBox1);
