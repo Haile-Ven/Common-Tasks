@@ -268,6 +268,7 @@ namespace Common_Tasks
                 
                 CancelBtn.Enabled = true;
                 _ = LoadTimer();
+                toastNotification.Show("Shutdown scheduled.", "Scheduled", true);
             }
 
             MinuteBoard.Value = 0;
@@ -291,7 +292,7 @@ namespace Common_Tasks
             _ = Process.Start(psi);
             try
             {
-                toastNotification.Show("Shutdown canceled.", "CANCELED", true);
+                toastNotification.Show("Shutdown canceled.", "Canceled", true);
             }
             catch
             {
