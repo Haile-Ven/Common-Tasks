@@ -206,18 +206,9 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Common Tasks"
-<<<<<<< HEAD
-        "ProductCode" = "8:{AC4F64C0-4495-4EE6-A3B0-DA859DEE8480}"
-        "PackageCode" = "8:{F5FCD86E-7A0C-4991-8B94-8FC3B1CC1E36}"
-        "UpgradeCode" = "8:{A5FB2120-532F-4C2B-B6A4-2CBF6DE2437B}"
-=======
-        "ProductCode" = "8:{A8424A22-BD18-4B76-B680-D5E4DB4BD7CA}"
-        "PackageCode" = "8:{4702D5B4-A991-49C3-80F7-C94252260E4F}"
-        "UpgradeCode" = "8:{BD000213-2E20-4988-A545-8F864279B6A7}"
-        "ProductCode" = "8:{30AAA2F0-F7A6-458B-B239-08B7D93CDF57}"
-        "PackageCode" = "8:{2FEC477E-1E83-4F1E-B731-E7AAE01B90BE}"
-        "UpgradeCode" = "8:{884A0B83-BBC2-489C-92F6-D9EB529E65C5}"
->>>>>>> a0baa4348342491ceef6d3940a25f6c67ed9667d
+        "ProductCode" = "8:{D1E99BD7-76DE-475C-9D65-4A08F241FE80}"
+        "PackageCode" = "8:{37BCBC7A-E1EC-4859-A2DF-B2D36F9C2A3F}"
+        "UpgradeCode" = "8:{1A4ED1B0-1241-456F-98D9-2840B8C38DDF}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
@@ -336,7 +327,7 @@
         }
         "Shortcut"
         {
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_82493762CCD245CCADAA48FE3272250C"
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_FC230EAA648B4164B763EA8D38AAE335"
             {
             "Name" = "8:Common Tasks"
             "Arguments" = "8:"

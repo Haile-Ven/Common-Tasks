@@ -43,6 +43,36 @@ namespace Common_Tasks
                 // Handle the exception without using toast notification
                 MessageBox.Show($"Error initializing toast notification: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            
+            // Check for command line arguments
+            string[] args = Environment.GetCommandLineArgs();
+            
+            // Handle delayed start to avoid instance conflicts
+            if (args.Length > 1 && args.Contains("--delayed-start"))
+            {
+                // Wait longer to ensure previous instance is fully closed
+                Timer delayTimer = new Timer();
+                delayTimer.Interval = 3000; // 3 seconds should be enough
+                delayTimer.Tick += (s, e) => 
+                {
+                    delayTimer.Stop();
+                    // Continue with normal initialization
+                };
+                delayTimer.Start();
+            }
+            // Handle clear events command
+            else if (args.Length > 1 && args.Contains("--clear-events"))
+            {
+                // Delay the opening of the form slightly to ensure the UI is fully loaded
+                Timer startupTimer = new Timer();
+                startupTimer.Interval = 500;
+                startupTimer.Tick += (s, e) => 
+                {
+                    startupTimer.Stop();
+                    OpenEventClearForm();
+                };
+                startupTimer.Start();
+            }
         }
 
         private void ExitItem_Click(object sender, EventArgs e)
@@ -366,36 +396,147 @@ namespace Common_Tasks
             {
                 if (!eventClearFormOpen)
                 {
-                    ClrEvntBtn.Enabled = false;
-                    EventClearForm eventClearForm = new EventClearForm();
-                    eventClearForm.FormClosed += (s, args) =>
+                    // Check if the current process has admin privileges
+                    if (!IsRunningAsAdmin())
                     {
-                        ClrEvntBtn.Enabled = true;
-                        eventClearFormOpen = false;
-                        EventClearFormClosed?.Invoke();
-                    };
-                    eventClearFormOpen = true;
-                    eventClearForm.ShowDialog();
+                        // Restart the application with admin privileges and pass command line argument
+                        RestartAsAdmin("--clear-events");
+                        return;
+                    }
+                    
+                    // If we're already running as admin, show the form
+                    OpenEventClearForm();
                 }
             }
-            catch
+            catch (Exception ex)
             {
                 try
                 {
-                    toastNotification.Show("File Error", "ERROR", false);
+                    toastNotification.Show($"Error: {ex.Message}", "ERROR", false);
                 }
                 catch
                 {
                     // Fallback to MessageBox if toast notification fails
-                    MessageBox.Show("File Error", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 ClrEvntBtn.Enabled = true;
+            }
+        }
+
+        private void OpenEventClearForm()
+        {
+            ClrEvntBtn.Enabled = false;
+            EventClearForm eventClearForm = new EventClearForm();
+            eventClearForm.FormClosed += EventClearForm_FormClosed;
+            eventClearFormOpen = true;
+            eventClearForm.ShowDialog();
+        }
+
+        private bool IsRunningAsAdmin()
+        {
+            // Check if the current process is running with administrative privileges
+            using (var identity = System.Security.Principal.WindowsIdentity.GetCurrent())
+            {
+                var principal = new System.Security.Principal.WindowsPrincipal(identity);
+                return principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
+            }
+        }
+
+        private void RestartAsAdmin(string arguments = "")
+        {
+            try
+            {
+                // Create a new process start info
+                ProcessStartInfo processInfo = new ProcessStartInfo
+                {
+                    FileName = Application.ExecutablePath,
+                    UseShellExecute = true,
+                    Verb = "runas", // This is what triggers the UAC prompt
+                    Arguments = arguments
+                };
+
+                // Start the new process
+                Process.Start(processInfo);
+
+                // Close the current process
+                Application.Exit();
+            }
+            catch (Exception ex)
+            {
+                // The user likely canceled the UAC prompt
+                try
+                {
+                    toastNotification.Show("Administrator privileges required.", "Access Denied", false);
+                }
+                catch
+                {
+                    MessageBox.Show("Administrator privileges required to clear events.", "Access Denied", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+        }
+
+        private void RestartWithNormalPrivileges()
+        {
+            try
+            {
+                // Create a new process start info without the runas verb
+                ProcessStartInfo processInfo = new ProcessStartInfo
+                {
+                    FileName = Application.ExecutablePath,
+                    UseShellExecute = true,
+                    // Add a delay to ensure the current instance has time to exit
+                    Arguments = "--delayed-start"
+                };
+
+                // Start the new process
+                Process.Start(processInfo);
+
+                // Clean up resources before exiting
+                if (shutdownToastNotification != null)
+                {
+                    shutdownToastNotification.Dispose();
+                }
+                
+                if (toastNotification != null)
+                {
+                    toastNotification.Dispose();
+                }
+                
+                // Hide the form and tray icon
+                this.Hide();
+                taskTrayIcon.Visible = false;
+                
+                // Force garbage collection to release resources
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                
+                // Exit the application
+                Environment.Exit(0);
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    toastNotification.Show($"Error restarting application: {ex.Message}", "ERROR", false);
+                }
+                catch
+                {
+                    MessageBox.Show($"Error restarting application: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
         private void EventClearForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             ClrEvntBtn.Enabled = true;
+            eventClearFormOpen = false;
+            EventClearFormClosed?.Invoke();
+            
+            // If we're running as admin, restart in normal mode
+            if (IsRunningAsAdmin())
+            {
+                RestartWithNormalPrivileges();
+            }
         }
 
         private void taskTrayIcon_MouseDoubleClick(object sender, MouseEventArgs e)
