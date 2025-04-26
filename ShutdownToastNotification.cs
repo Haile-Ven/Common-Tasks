@@ -146,7 +146,7 @@ namespace Common_Tasks
             // Try to get the original scheduled time from the log file
             try
             {
-                string logContent = File.ReadAllText("log");
+                string logContent = File.ReadAllText(AppConfig.LogFilePath);
                 string[] parts = logContent.Split('|');
                 
                 if (parts.Length > 1)
@@ -220,13 +220,12 @@ namespace Common_Tasks
             try
             {
 
-                if (!File.Exists("log"))
+                if (!File.Exists(AppConfig.LogFilePath))
                 {
-
                     return;
                 }
                 
-                string fileContent = File.ReadAllText("log");
+                string fileContent = File.ReadAllText(AppConfig.LogFilePath);
                 if (string.IsNullOrEmpty(fileContent))
                 {
                     return;
@@ -284,7 +283,7 @@ namespace Common_Tasks
             // Try to get the original scheduled time from the log file
             try
             {
-                string logContent = File.ReadAllText("log");
+                string logContent = File.ReadAllText(AppConfig.LogFilePath);
                 string[] parts = logContent.Split('|');
                 
                 if (parts.Length > 1)

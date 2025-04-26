@@ -117,16 +117,15 @@ namespace Common_Tasks
         {
             try
             {
-                if (!File.Exists("log"))
+                if (!File.Exists(AppConfig.LogFilePath))
                 {
-
                     return;
                 }
 
-                string fileContent = File.ReadAllText("log");
+                string fileContent = File.ReadAllText(AppConfig.LogFilePath);
                 if (string.IsNullOrEmpty(fileContent))
                 {
-                    File.Delete("log");
+                    File.Delete(AppConfig.LogFilePath);
                     return;
                 }
 
@@ -142,7 +141,7 @@ namespace Common_Tasks
                 else
                 {
                     // Invalid format, delete the log file
-                    File.Delete("log");
+                    File.Delete(AppConfig.LogFilePath);
                     return;
                 }
 
@@ -150,7 +149,7 @@ namespace Common_Tasks
                 if (shutdownTime <= DateTime.Now)
                 {
 
-                    File.Delete("log");
+                    File.Delete(AppConfig.LogFilePath);
                     return;
                 }
 
@@ -187,12 +186,12 @@ namespace Common_Tasks
             {
                 if (isShutdownCancelled)
                 {
-                    File.Delete("log");
+                    File.Delete(AppConfig.LogFilePath);
                     shutdownToastNotification.HideShutdownCountdown();
                     return;
                 }
 
-                string fileContent = File.ReadAllText("log");
+                string fileContent = File.ReadAllText(AppConfig.LogFilePath);
                 
                 // Parse the log file content
                 string[] parts = fileContent.Split('|');
@@ -206,7 +205,7 @@ namespace Common_Tasks
                 else
                 {
                     // Invalid format, delete the log file
-                    File.Delete("log");
+                    File.Delete(AppConfig.LogFilePath);
                     return;
                 }
 
@@ -214,7 +213,7 @@ namespace Common_Tasks
                 {
                     if (isShutdownCancelled)
                     {
-                        File.Delete("log");
+                        File.Delete(AppConfig.LogFilePath);
                         shutdownToastNotification.HideShutdownCountdown();
                         return; 
                     }
@@ -224,7 +223,7 @@ namespace Common_Tasks
                     if (remainingTime <= TimeSpan.Zero)
                     {
                         taskTrayIcon.Text = "Shutdown time reached.";
-                        File.Delete("log");
+                        File.Delete(AppConfig.LogFilePath);
                         return;
                     }
 
@@ -294,7 +293,7 @@ namespace Common_Tasks
                 // Save both the shutdown time and the original scheduling time
                 string shutdownTimeStr = shutdownTime.ToString("yyyy-MM-dd HH:mm:ss");
                 string currentTimeStr = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                File.WriteAllText("log", shutdownTimeStr + "|" + currentTimeStr);
+                File.WriteAllText(AppConfig.LogFilePath, shutdownTimeStr + "|" + currentTimeStr);
                 
                 CancelBtn.Enabled = true;
                 _ = LoadTimer();
@@ -308,7 +307,7 @@ namespace Common_Tasks
         private void CancelBtn_Click(object sender, EventArgs e)
         {
             isShutdownCancelled = true;
-            File.Delete("log"); 
+            File.Delete(AppConfig.LogFilePath); 
             CancelBtn.Enabled = false;
             ShutdownBtn.Enabled = true;
             
@@ -340,16 +339,16 @@ namespace Common_Tasks
         {
             try
             {
-                if (!File.Exists("log"))
+                if (!File.Exists(AppConfig.LogFilePath))
                 {
                     return;
                 }
 
-                string dateLine = File.ReadLines("log").FirstOrDefault();
+                string dateLine = File.ReadLines(AppConfig.LogFilePath).FirstOrDefault();
 
                 if (string.IsNullOrEmpty(dateLine))
                 {
-                    File.Delete("log");
+                    File.Delete(AppConfig.LogFilePath);
                     return;
                 }
 
@@ -363,12 +362,12 @@ namespace Common_Tasks
 
                     if (currentTime > shutdownTime)
                     {
-                        File.Delete("log");
+                        File.Delete(AppConfig.LogFilePath);
                     }
                 }
                 else
                 {
-                    File.Delete("log");
+                    File.Delete(AppConfig.LogFilePath);
                 }
             }
             catch (Exception ex)

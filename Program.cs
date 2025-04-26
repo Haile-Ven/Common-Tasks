@@ -17,6 +17,10 @@ namespace Common_Tasks
                 {
                     Application.EnableVisualStyles();
                     Application.SetCompatibleTextRenderingDefault(false);
+                    
+                    // Initialize AppConfig to ensure the log directory is created
+                    string logPath = AppConfig.LogFilePath;
+                    
                     MainForm mainForm = new MainForm();
                     Application.Run(mainForm);
                 }
