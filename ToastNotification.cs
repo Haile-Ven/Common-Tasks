@@ -51,12 +51,13 @@ namespace SelfSampleProRAD_DB.UserControls
         {
             if (_parentForm != null)
             {
-                int width = Math.Min(350, _parentForm.ClientSize.Width - 40);
+                int width = Math.Min(300, _parentForm.ClientSize.Width - 40);
                 Width = width;
                 
+                // Position at bottom left with a small margin
                 Location = new Point(
-                    (_parentForm.ClientSize.Width - Width) / 2,
-                    0);
+                    20,
+                    _parentForm.ClientSize.Height - Height - 20);
             }
         }
 
@@ -90,28 +91,38 @@ namespace SelfSampleProRAD_DB.UserControls
             }
             else
             {
-                titleLabel.ForeColor = Color.FromArgb(76, 175, 80);
-                iconPictureBox.Image = CreateCheckmarkImage();
+                titleLabel.ForeColor = Color.FromArgb(30, 144, 255); // Match blue color with icon
+                iconPictureBox.Image = CreateInfoImage();
             }
             Invalidate();
         }
 
 
-        private Image CreateCheckmarkImage()
+        private Image CreateInfoImage()
         {
-
             Bitmap bmp = new Bitmap(24, 24);
             using (Graphics g = Graphics.FromImage(bmp))
             {
                 g.SmoothingMode = SmoothingMode.AntiAlias;
-                using (Pen pen = new Pen(Color.FromArgb(76, 175, 80), 3))
+                Color blueColor = Color.FromArgb(30, 144, 255); // Dodger Blue
+                Color whiteColor = Color.White;
+                
+                // Draw filled blue circle
+                using (SolidBrush brush = new SolidBrush(blueColor))
                 {
-
-                    g.DrawLines(pen, new Point[] {
-                        new Point(5, 12),
-                        new Point(10, 17),
-                        new Point(19, 7)
-                    });
+                    g.FillEllipse(brush, 2, 2, 20, 20);
+                }
+                
+                // Draw white 'i' stem
+                using (Pen pen = new Pen(whiteColor, 2))
+                {
+                    g.DrawLine(pen, 12, 10, 12, 18);
+                }
+                
+                // Draw white 'i' dot
+                using (SolidBrush brush = new SolidBrush(whiteColor))
+                {
+                    g.FillEllipse(brush, 11, 6, 2, 2);
                 }
             }
             return bmp;
@@ -141,7 +152,7 @@ namespace SelfSampleProRAD_DB.UserControls
             
             Color borderColor = _isErrorStyle ? 
                 Color.FromArgb(255, 99, 71) : 
-                Color.FromArgb(76, 175, 80);
+                Color.FromArgb(30, 144, 255); // Match blue color with icon
 
             using (SolidBrush brush = new SolidBrush(borderColor))
             {
