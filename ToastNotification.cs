@@ -150,6 +150,9 @@ namespace SelfSampleProRAD_DB.UserControls
         {
             base.OnPaint(e);
             
+            // Set high quality text rendering
+            e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+            
             Color borderColor = _isErrorStyle ? 
                 Color.FromArgb(255, 99, 71) : 
                 Color.FromArgb(30, 144, 255); // Match blue color with icon

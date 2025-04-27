@@ -62,7 +62,7 @@ namespace Common_Tasks
             // _titleLabel
             // 
             _titleLabel.AutoSize = true;
-            _titleLabel.Font = new Font("Segoe UI", 8, FontStyle.Bold);
+            _titleLabel.Font = new Font("Segoe UI", 9, FontStyle.Bold);
             _titleLabel.ForeColor = _titleColor;
             _titleLabel.Location = new Point(70, 5);
             _titleLabel.Name = "_titleLabel";
@@ -73,7 +73,7 @@ namespace Common_Tasks
             // _timeRemainingLabel
             // 
             _timeRemainingLabel.AutoSize = true;
-            _timeRemainingLabel.Font = new Font("Segoe UI", 8);
+            _timeRemainingLabel.Font = new Font("Segoe UI", 8.25F);
             _timeRemainingLabel.ForeColor = _textColor;
             _timeRemainingLabel.Location = new Point(70, 25);
             _timeRemainingLabel.Name = "_timeRemainingLabel";
@@ -84,7 +84,7 @@ namespace Common_Tasks
             // _shutdownTimeLabel
             // 
             _shutdownTimeLabel.AutoSize = true;
-            _shutdownTimeLabel.Font = new Font("Segoe UI", 8);
+            _shutdownTimeLabel.Font = new Font("Segoe UI", 8.25F);
             _shutdownTimeLabel.ForeColor = _textColor;
             _shutdownTimeLabel.Location = new Point(70, 65);
             _shutdownTimeLabel.Name = "_shutdownTimeLabel";
@@ -368,6 +368,7 @@ namespace Common_Tasks
             g.InterpolationMode = InterpolationMode.HighQualityBicubic;
             g.PixelOffsetMode = PixelOffsetMode.HighQuality;
             g.CompositingQuality = CompositingQuality.HighQuality;
+            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
 
 
             int centerX = _progressLocation.X + (_progressSize / 2);

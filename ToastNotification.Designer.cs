@@ -41,7 +41,7 @@ namespace SelfSampleProRAD_DB.UserControls
             // titleLabel
             // 
             titleLabel.AutoSize = true;
-            titleLabel.Font = new Font("Microsoft Sans Serif", 8F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            titleLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
             titleLabel.ForeColor = Color.FromArgb(30, 144, 255);
             titleLabel.Location = new Point(55, 5);
             titleLabel.Name = "titleLabel";
@@ -51,7 +51,7 @@ namespace SelfSampleProRAD_DB.UserControls
             // 
             // messageLabel
             // 
-            messageLabel.Font = new Font("Microsoft Sans Serif", 7F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            messageLabel.Font = new Font("Segoe UI", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
             messageLabel.ForeColor = Color.FromArgb(100, 100, 100);
             messageLabel.Location = new Point(55, 25);
             messageLabel.Name = "messageLabel";
@@ -87,6 +87,9 @@ namespace SelfSampleProRAD_DB.UserControls
             // 
             // ToastNotification
             // 
+            this.SetStyle(System.Windows.Forms.ControlStyles.OptimizedDoubleBuffer | 
+                System.Windows.Forms.ControlStyles.AllPaintingInWmPaint | 
+                System.Windows.Forms.ControlStyles.SupportsTransparentBackColor, true);
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;

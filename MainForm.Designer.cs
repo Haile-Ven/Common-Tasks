@@ -1,4 +1,4 @@
-﻿
+
 namespace Common_Tasks
 {
     partial class MainForm
@@ -71,14 +71,20 @@ namespace Common_Tasks
             // 
             // ClrEvntBtn
             // 
-            ClrEvntBtn.BackColor = System.Drawing.SystemColors.ButtonFace;
+            ClrEvntBtn.BackColor = System.Drawing.Color.FromArgb(0, 122, 204);
+            ClrEvntBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             ClrEvntBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            ClrEvntBtn.ForeColor = System.Drawing.Color.White;
+            ClrEvntBtn.Image = (System.Drawing.Image)resources.GetObject("ClrEvntBtn.Image");
+            ClrEvntBtn.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             ClrEvntBtn.Location = new System.Drawing.Point(14, 55);
             ClrEvntBtn.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             ClrEvntBtn.Name = "ClrEvntBtn";
-            ClrEvntBtn.Size = new System.Drawing.Size(115, 46);
+            ClrEvntBtn.Size = new System.Drawing.Size(126, 47);
             ClrEvntBtn.TabIndex = 8;
             ClrEvntBtn.Text = "Clear Events";
+            ClrEvntBtn.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            ClrEvntBtn.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             ClrEvntBtn.UseVisualStyleBackColor = false;
             ClrEvntBtn.Click += ClrEvntBtn_Click;
             // 
@@ -143,8 +149,10 @@ namespace Common_Tasks
             // 
             // CancelBtn
             // 
-            CancelBtn.BackColor = System.Drawing.SystemColors.ButtonFace;
+            CancelBtn.BackColor = System.Drawing.Color.FromArgb(192, 0, 0);
+            CancelBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             CancelBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            CancelBtn.ForeColor = System.Drawing.Color.White;
             CancelBtn.Location = new System.Drawing.Point(132, 83);
             CancelBtn.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             CancelBtn.Name = "CancelBtn";
@@ -156,8 +164,10 @@ namespace Common_Tasks
             // 
             // ShutdownBtn
             // 
-            ShutdownBtn.BackColor = System.Drawing.SystemColors.ButtonFace;
+            ShutdownBtn.BackColor = System.Drawing.Color.FromArgb(0, 130, 135);
+            ShutdownBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             ShutdownBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            ShutdownBtn.ForeColor = System.Drawing.Color.White;
             ShutdownBtn.Location = new System.Drawing.Point(26, 83);
             ShutdownBtn.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             ShutdownBtn.Name = "ShutdownBtn";
@@ -235,6 +245,7 @@ namespace Common_Tasks
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            BackColor = System.Drawing.Color.FromArgb(235, 242, 250);
             ClientSize = new System.Drawing.Size(328, 504);
             Controls.Add(timerPanel);
             Controls.Add(pictureBox1);

@@ -156,8 +156,8 @@ namespace Common_Tasks
                 shtDwnTmLbl.Text = string.Empty;
                 remTmLbl.Text = string.Empty;
                 
-                ShutdownBtn.Enabled = false;
-                CancelBtn.Enabled = true;
+                UpdateShutdownButtonState(false);
+                UpdateCancelButtonState(true);
              
                 shutdownToastNotification.Visible = true;
                 shutdownToastNotification.BringToFront();
@@ -295,7 +295,8 @@ namespace Common_Tasks
                 string currentTimeStr = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                 File.WriteAllText(AppConfig.LogFilePath, shutdownTimeStr + "|" + currentTimeStr);
                 
-                CancelBtn.Enabled = true;
+                UpdateCancelButtonState(true);
+                UpdateShutdownButtonState(false);
                 _ = LoadTimer();
                 toastNotification.Show("Shutdown scheduled.", "Scheduled", true);
             }
@@ -308,8 +309,9 @@ namespace Common_Tasks
         {
             isShutdownCancelled = true;
             File.Delete(AppConfig.LogFilePath); 
-            CancelBtn.Enabled = false;
-            ShutdownBtn.Enabled = true;
+            UpdateCancelButtonState(false);
+            UpdateShutdownButtonState(true);
+            shtDwnTmLbl.Text = string.Empty;
             
             ProcessStartInfo psi = new ProcessStartInfo
             {
@@ -319,6 +321,7 @@ namespace Common_Tasks
                 UseShellExecute = false
             };
             _ = Process.Start(psi);
+
             try
             {
                 toastNotification.Show("Shutdown canceled.", "Canceled", true);
@@ -335,6 +338,46 @@ namespace Common_Tasks
             shtDwnTmLbl.Text =  string.Empty;
             taskTrayIcon.Text = "Common Tasks";
         }
+        private void UpdateShutdownButtonState(bool enabled)
+        {
+            ShutdownBtn.Enabled = enabled;
+            
+            if (enabled)
+            {
+                // Restore original button appearance
+                ShutdownBtn.BackColor = System.Drawing.Color.FromArgb(0, 130, 135);
+                ShutdownBtn.ForeColor = System.Drawing.Color.White;
+                ShutdownBtn.FlatAppearance.BorderColor = ShutdownBtn.BackColor;
+            }
+            else
+            {
+                // Apply disabled style
+                ShutdownBtn.BackColor = System.Drawing.Color.FromArgb(180, 180, 180);
+                ShutdownBtn.ForeColor = System.Drawing.Color.FromArgb(120, 120, 120);
+                ShutdownBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(160, 160, 160);
+            }
+        }
+
+        private void UpdateCancelButtonState(bool enabled)
+        {
+            CancelBtn.Enabled = enabled;
+            
+            if (enabled)
+            {
+                // Restore original button appearance
+                CancelBtn.BackColor = System.Drawing.Color.FromArgb(192, 0, 0);
+                CancelBtn.ForeColor = System.Drawing.Color.White;
+                CancelBtn.FlatAppearance.BorderColor = CancelBtn.BackColor;
+            }
+            else
+            {
+                // Apply disabled style
+                CancelBtn.BackColor = System.Drawing.Color.FromArgb(180, 180, 180);
+                CancelBtn.ForeColor = System.Drawing.Color.FromArgb(120, 120, 120);
+                CancelBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(160, 160, 160);
+            }
+        }
+
         static void DeleteFileIfExpired()
         {
             try
