@@ -30,7 +30,7 @@ namespace Common_Tasks
             taskTrayIcon.Text = "Common Tasks";
             
             InitializeShutdownNotification();
-            DeleteFileIfExpired();
+            DatabaseManager.DeleteExpiredSchedules();
             _ = LoadTimer();
             
             try
@@ -117,39 +117,20 @@ namespace Common_Tasks
         {
             try
             {
-                if (!File.Exists(AppConfig.LogFilePath))
+                // Get the active shutdown schedule from the database
+                var schedule = DatabaseManager.GetActiveShutdownSchedule();
+                if (schedule == null)
                 {
                     return;
                 }
 
-                string fileContent = File.ReadAllText(AppConfig.LogFilePath);
-                if (string.IsNullOrEmpty(fileContent))
-                {
-                    File.Delete(AppConfig.LogFilePath);
-                    return;
-                }
+                DateTime startTime = schedule.Item1;
+                DateTime shutdownTime = schedule.Item2;
 
-                // Parse the log file content
-                string[] parts = fileContent.Split('|');
-                DateTime shutdownTime;
-                
-                if (parts.Length > 0)
-                {
-                    // Get the shutdown time (first part)
-                    shutdownTime = DateTime.Parse(parts[0]);
-                }
-                else
-                {
-                    // Invalid format, delete the log file
-                    File.Delete(AppConfig.LogFilePath);
-                    return;
-                }
-
-
+                // Check if the shutdown time has already passed
                 if (shutdownTime <= DateTime.Now)
                 {
-
-                    File.Delete(AppConfig.LogFilePath);
+                    DatabaseManager.DeleteAllActiveSchedules();
                     return;
                 }
 
@@ -186,34 +167,27 @@ namespace Common_Tasks
             {
                 if (isShutdownCancelled)
                 {
-                    File.Delete(AppConfig.LogFilePath);
+                    DatabaseManager.DeleteAllActiveSchedules();
                     shutdownToastNotification.HideShutdownCountdown();
                     return;
                 }
 
-                string fileContent = File.ReadAllText(AppConfig.LogFilePath);
-                
-                // Parse the log file content
-                string[] parts = fileContent.Split('|');
-                DateTime shutdownTime;
-                
-                if (parts.Length > 0)
+                // Get the active shutdown schedule from the database
+                var schedule = DatabaseManager.GetActiveShutdownSchedule();
+                if (schedule == null)
                 {
-                    // Get the shutdown time (first part)
-                    shutdownTime = DateTime.Parse(parts[0]);
-                }
-                else
-                {
-                    // Invalid format, delete the log file
-                    File.Delete(AppConfig.LogFilePath);
+                    // No active schedule found
                     return;
                 }
+                
+                DateTime startTime = schedule.Item1;
+                DateTime shutdownTime = schedule.Item2;
 
                 while (true)
                 {
                     if (isShutdownCancelled)
                     {
-                        File.Delete(AppConfig.LogFilePath);
+                        DatabaseManager.DeleteAllActiveSchedules();
                         shutdownToastNotification.HideShutdownCountdown();
                         return; 
                     }
@@ -223,7 +197,7 @@ namespace Common_Tasks
                     if (remainingTime <= TimeSpan.Zero)
                     {
                         taskTrayIcon.Text = "Shutdown time reached.";
-                        File.Delete(AppConfig.LogFilePath);
+                        DatabaseManager.DeleteAllActiveSchedules();
                         return;
                     }
 
@@ -290,10 +264,8 @@ namespace Common_Tasks
 
                 _ = Process.Start(psi);
 
-                // Save both the shutdown time and the original scheduling time
-                string shutdownTimeStr = shutdownTime.ToString("yyyy-MM-dd HH:mm:ss");
-                string currentTimeStr = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                File.WriteAllText(AppConfig.LogFilePath, shutdownTimeStr + "|" + currentTimeStr);
+                // Save both the shutdown time and the original scheduling time to the database
+                DatabaseManager.SaveShutdownSchedule(DateTime.Now, shutdownTime);
                 
                 UpdateCancelButtonState(true);
                 UpdateShutdownButtonState(false);
@@ -307,36 +279,39 @@ namespace Common_Tasks
 
         private void CancelBtn_Click(object sender, EventArgs e)
         {
-            isShutdownCancelled = true;
-            File.Delete(AppConfig.LogFilePath); 
-            UpdateCancelButtonState(false);
-            UpdateShutdownButtonState(true);
-            shtDwnTmLbl.Text = string.Empty;
-            
-            ProcessStartInfo psi = new ProcessStartInfo
+            if (MessageBox.Show("Are you sure you want to cancel scheduled shutdown ?", "Confirm", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK)
             {
-                FileName = "shutdown",
-                Arguments = "/a",
-                CreateNoWindow = true,
-                UseShellExecute = false
-            };
-            _ = Process.Start(psi);
+                isShutdownCancelled = true;
+                DatabaseManager.DeleteAllActiveSchedules();
+                UpdateCancelButtonState(false);
+                UpdateShutdownButtonState(true);
+                shtDwnTmLbl.Text = string.Empty;
 
-            try
-            {
-                toastNotification.Show("Shutdown canceled.", "Canceled", true);
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = "shutdown",
+                    Arguments = "/a",
+                    CreateNoWindow = true,
+                    UseShellExecute = false
+                };
+                _ = Process.Start(psi);
+
+                try
+                {
+                    toastNotification.Show("Shutdown canceled.", "Canceled", true);
+                }
+                catch
+                {
+                    // Fallback to MessageBox if toast notification fails
+                    MessageBox.Show("Shutdown canceled.", "Canceled", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+
+                shutdownToastNotification.HideShutdownCountdown();
+
+                remTmLbl.Text = string.Empty;
+                shtDwnTmLbl.Text = string.Empty;
+                taskTrayIcon.Text = "Common Tasks";
             }
-            catch
-            {
-                // Fallback to MessageBox if toast notification fails
-                MessageBox.Show("Shutdown canceled.", "Canceled", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            
-            shutdownToastNotification.HideShutdownCountdown();
-            
-            remTmLbl.Text = string.Empty;
-            shtDwnTmLbl.Text =  string.Empty;
-            taskTrayIcon.Text = "Common Tasks";
         }
         private void UpdateShutdownButtonState(bool enabled)
         {
@@ -380,41 +355,21 @@ namespace Common_Tasks
 
         static void DeleteFileIfExpired()
         {
+            // This method is kept for backward compatibility but now uses the database
+            // The actual implementation is in DatabaseManager.DeleteExpiredSchedules()
+            DatabaseManager.DeleteExpiredSchedules();
+            
+            // Clean up the old log file if it exists
             try
             {
-                if (!File.Exists(AppConfig.LogFilePath))
-                {
-                    return;
-                }
-
-                string dateLine = File.ReadLines(AppConfig.LogFilePath).FirstOrDefault();
-
-                if (string.IsNullOrEmpty(dateLine))
-                {
-                    File.Delete(AppConfig.LogFilePath);
-                    return;
-                }
-
-                // Parse the log file content
-                string[] parts = dateLine.Split('|');
-                DateTime shutdownTime;
-
-                if (parts.Length > 0 && DateTime.TryParse(parts[0], out shutdownTime))
-                {
-                    DateTime currentTime = DateTime.Now;
-
-                    if (currentTime > shutdownTime)
-                    {
-                        File.Delete(AppConfig.LogFilePath);
-                    }
-                }
-                else
+                if (File.Exists(AppConfig.LogFilePath))
                 {
                     File.Delete(AppConfig.LogFilePath);
                 }
             }
             catch (Exception ex)
             {
+                // Ignore exceptions when trying to delete the old log file
             }
         }
 

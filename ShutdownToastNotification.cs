@@ -143,20 +143,18 @@ namespace Common_Tasks
             DateTime now = DateTime.Now;
             DateTime scheduledTime;
             
-            // Try to get the original scheduled time from the log file
+            // Try to get the original scheduled time from the database
             try
             {
-                string logContent = File.ReadAllText(AppConfig.LogFilePath);
-                string[] parts = logContent.Split('|');
-                
-                if (parts.Length > 1)
+                var schedule = DatabaseManager.GetActiveShutdownSchedule();
+                if (schedule != null)
                 {
-                    // New format: shutdownTime|scheduledTime
-                    scheduledTime = DateTime.Parse(parts[1]);
+                    // Get the start time from the database
+                    scheduledTime = schedule.Item1;
                 }
                 else
                 {
-                    // Old format or fallback: just use current time
+                    // Fallback: just use current time
                     scheduledTime = now;
                 }
             }
@@ -225,28 +223,20 @@ namespace Common_Tasks
                     return;
                 }
                 
-                string fileContent = File.ReadAllText(AppConfig.LogFilePath);
-                if (string.IsNullOrEmpty(fileContent))
+                // Get the active shutdown schedule from the database
+                var schedule = DatabaseManager.GetActiveShutdownSchedule();
+                if (schedule == null)
                 {
                     return;
                 }
                 
-                // Parse the log file content
-                string[] parts = fileContent.Split('|');
-                DateTime shutdownTime;
+                DateTime shutdownTime = schedule.Item2;
                 
-                if (parts.Length > 0 && DateTime.TryParse(parts[0], out shutdownTime))
+                if (shutdownTime > DateTime.Now)
                 {
-
-                    if (shutdownTime > DateTime.Now)
-                    {
-
-                        
-
-                        Visible = true;
-                        BringToFront();
-                        ShowShutdownCountdown(shutdownTime);
-                    }
+                    Visible = true;
+                    BringToFront();
+                    ShowShutdownCountdown(shutdownTime);
                 }
             }
             catch (Exception ex)
