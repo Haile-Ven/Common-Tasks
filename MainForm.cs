@@ -1,7 +1,6 @@
 using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -79,17 +78,6 @@ namespace Common_Tasks
         {
             taskTrayIcon.Visible = false;
             Application.Exit();
-        }
-
-        protected override void OnResize(EventArgs e)
-        {
-            base.OnResize(e);
-            if (WindowState == FormWindowState.Minimized)
-            {
-                Hide();
-                ShowInTaskbar = false;
-                taskTrayIcon.Visible = true;
-            }
         }
 
         private void MinuteBoard_ValueChanged(object sender, EventArgs e)
@@ -350,26 +338,6 @@ namespace Common_Tasks
                 CancelBtn.BackColor = System.Drawing.Color.FromArgb(180, 180, 180);
                 CancelBtn.ForeColor = System.Drawing.Color.FromArgb(120, 120, 120);
                 CancelBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(160, 160, 160);
-            }
-        }
-
-        static void DeleteFileIfExpired()
-        {
-            // This method is kept for backward compatibility but now uses the database
-            // The actual implementation is in DatabaseManager.DeleteExpiredSchedules()
-            DatabaseManager.DeleteExpiredSchedules();
-            
-            // Clean up the old log file if it exists
-            try
-            {
-                if (File.Exists(AppConfig.LogFilePath))
-                {
-                    File.Delete(AppConfig.LogFilePath);
-                }
-            }
-            catch (Exception ex)
-            {
-                // Ignore exceptions when trying to delete the old log file
             }
         }
 

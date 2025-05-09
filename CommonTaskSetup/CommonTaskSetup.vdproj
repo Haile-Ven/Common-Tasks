@@ -206,9 +206,9 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Common Tasks"
-        "ProductCode" = "8:{3E72F327-2E2D-457C-BDB7-217A2A9773F4}"
-        "PackageCode" = "8:{0C846F30-7CA8-4FC8-B74C-4C70434CF20A}"
-        "UpgradeCode" = "8:{AB554277-E669-4EBA-A209-C2C5B41AC63A}"
+        "ProductCode" = "8:{413FAF02-9F63-4A9F-ACBF-B9B14410826C}"
+        "PackageCode" = "8:{26F085B1-EC92-4BF5-8F29-D8A35F56BA8D}"
+        "UpgradeCode" = "8:{3DC612DF-4C0D-40CE-B1A3-43D60B46A401}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
