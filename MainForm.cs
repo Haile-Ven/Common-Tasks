@@ -80,6 +80,12 @@ namespace Common_Tasks
             Application.Exit();
         }
 
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+            // No special handling for minimize - let it behave normally
+        }
+
         private void MinuteBoard_ValueChanged(object sender, EventArgs e)
         {
             if (MinuteBoard.Value >= 60)
@@ -533,7 +539,9 @@ namespace Common_Tasks
             if (e.CloseReason == CloseReason.UserClosing)
             {
                 e.Cancel = true;
-                WindowState = FormWindowState.Minimized;
+                Hide();
+                ShowInTaskbar = false;
+                taskTrayIcon.Visible = true;
             }
         }
     }
