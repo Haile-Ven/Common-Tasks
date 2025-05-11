@@ -11,31 +11,17 @@ namespace Common_Tasks
         
         static DatabaseManager()
         {
-            try
+            // Always use AppData folder for database storage
+            string appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Common Tasks");
+            
+            // Create the directory if it doesn't exist
+            if (!Directory.Exists(appDataFolder))
             {
-                // Initialize the database path in the installation folder
-                string installationFolder = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                
-                // Set the database path
-                DatabasePath = Path.Combine(installationFolder, "shutdown.db");
-                
-                // Test if we can write to this location
-                TestDatabaseAccess(installationFolder);
+                Directory.CreateDirectory(appDataFolder);
             }
-            catch (UnauthorizedAccessException)
-            {
-                // Fallback to user's AppData folder if we don't have write access to the installation folder
-                string appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Common Tasks");
-                
-                // Create the directory if it doesn't exist
-                if (!Directory.Exists(appDataFolder))
-                {
-                    Directory.CreateDirectory(appDataFolder);
-                }
-                
-                // Set the database path to the AppData folder
-                DatabasePath = Path.Combine(appDataFolder, "shutdown.db");
-            }
+            
+            // Set the database path to the AppData folder
+            DatabasePath = Path.Combine(appDataFolder, "shutdown.db");
             
             // Set the connection string after the database path has been determined
             ConnectionString = $"Data Source={DatabasePath};Version=3;";
@@ -158,7 +144,7 @@ namespace Common_Tasks
         }
         
         /// <summary>
-        /// Deletes all active shutdown schedules from the database
+        /// Deletes all active shutdown schedules from the database and ensures proper cleanup
         /// </summary>
         /// <returns>True if the operation was successful</returns>
         public static bool DeleteAllActiveSchedules()
@@ -169,17 +155,43 @@ namespace Common_Tasks
                 {
                     connection.Open();
                     
-                    using (var command = new SQLiteCommand(connection))
+                    // First delete all active schedules within a transaction
+                    using (var transaction = connection.BeginTransaction())
                     {
-                        command.CommandText = "DELETE FROM shutdown_schedule WHERE is_active = 1";
-                        command.ExecuteNonQuery();
-                        return true;
+                        try
+                        {
+                            using (var command = new SQLiteCommand(connection))
+                            {
+                                // Delete all schedules regardless of is_active status
+                                command.CommandText = "DELETE FROM shutdown_schedule";
+                                command.ExecuteNonQuery();
+                            }
+                            
+                            // Commit the transaction
+                            transaction.Commit();
+                        }
+                        catch (Exception ex)
+                        {
+                            // Rollback the transaction if anything fails
+                            transaction.Rollback();
+                            throw new Exception("Failed to delete schedules: " + ex.Message, ex);
+                        }
                     }
+                    
+                    // VACUUM must be executed outside of a transaction
+                    using (var command = new SQLiteCommand("VACUUM", connection))
+                    {
+                        command.ExecuteNonQuery();
+                    }
+                    
+                    return true;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error deleting schedules: {ex.Message}");
+                // Log the error to a file since Console.WriteLine won't be visible in installed app
+                string errorLogPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "CommonTasks_Error.log");
+                File.AppendAllText(errorLogPath, $"Error deleting schedules: {ex.Message}\r\n");
                 return false;
             }
         }

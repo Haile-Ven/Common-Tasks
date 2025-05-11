@@ -9,18 +9,17 @@ namespace Common_Tasks
         
         static AppConfig()
         {
-            // Initialize the log file path in the Documents folder
-            string documentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            string appFolder = Path.Combine(documentsFolder, "Common Tasks");
+            // Always use AppData folder for log storage, same as DatabaseManager
+            string appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Common Tasks");
             
             // Create the directory if it doesn't exist
-            if (!Directory.Exists(appFolder))
+            if (!Directory.Exists(appDataFolder))
             {
-                Directory.CreateDirectory(appFolder);
+                Directory.CreateDirectory(appDataFolder);
             }
             
-            // Set the log file path
-            _logFilePath = Path.Combine(appFolder, "shutdown.log");
+            // Set the log file path to the AppData folder
+            _logFilePath = Path.Combine(appDataFolder, "shutdown.log");
         }
         
         /// <summary>
