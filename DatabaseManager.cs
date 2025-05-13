@@ -221,9 +221,8 @@ namespace Common_Tasks
                     using (var command = new SQLiteCommand(connection))
                     {
                         command.CommandText = @"
-                            UPDATE shutdown_schedule 
-                            SET is_active = 0 
-                            WHERE is_active = 1 AND datetime(shutdown_time) <= datetime('now', 'localtime')";
+                            DELETE FROM shutdown_schedule 
+                            WHERE datetime(shutdown_time) <= datetime('now', 'localtime')";
                         
                         command.ExecuteNonQuery();
                         return true;
