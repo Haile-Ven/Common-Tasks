@@ -11,13 +11,13 @@ namespace Common_Tasks
     public partial class EventClearForm : Form
     {
         int errCount = 0, outCount = 0, totalEvent = 0;
-        bool canClose = false;
+        bool canClose = false, isChecked = false;
         private ToastNotification toastNotification;
 
         public EventClearForm()
         {
             InitializeComponent();
-            
+
             // Initialize and attach toast notification
             toastNotification = new ToastNotification();
             toastNotification.AttachToForm(this);
@@ -31,6 +31,18 @@ namespace Common_Tasks
                 await PrepareEventClearing(BatContenet.EventCountBatchContent);
                 await ClearEventLogs(BatContenet.EventClearBatchContent);
                 await Task.Delay(5000);
+                if (isChecked)
+                {
+                    ProcessStartInfo psi = new ProcessStartInfo
+                    {
+                        FileName = "shutdown",
+                        Arguments = $"/p",
+                        CreateNoWindow = true,
+                        UseShellExecute = false
+                    };
+
+                    _ = Process.Start(psi);
+                }
                 Close();
             }
             catch (System.ComponentModel.Win32Exception)
@@ -79,7 +91,7 @@ namespace Common_Tasks
                     BeginInvoke(new Action(() =>
                     {
                         msgLbl.Text = outputData;
-                        if(outCount!= totalEvent) sucLbl.Text = $"{++outCount} Succeeded.";
+                        if (outCount != totalEvent) sucLbl.Text = $"{++outCount} Succeeded.";
                         prgsBar.Value = outCount * 100 / totalEvent;
                         prgLbl.Text = $"{prgsBar.Value}%";
                     }));
@@ -171,6 +183,12 @@ namespace Common_Tasks
             {
                 toastNotification.Show(ex.Message, "ERROR", false);
             }
+        }
+
+        private void shutdownChkBx_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!isChecked) isChecked = true;
+            else isChecked = false;
         }
     }
 }
