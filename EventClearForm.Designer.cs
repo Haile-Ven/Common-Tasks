@@ -36,15 +36,16 @@
             errLbl = new System.Windows.Forms.Label();
             imgPcBx = new System.Windows.Forms.PictureBox();
             totEvtLbl = new System.Windows.Forms.Label();
+            shutdownChkBx = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)imgPcBx).BeginInit();
             SuspendLayout();
             // 
             // prgsBar
             // 
-            prgsBar.Location = new System.Drawing.Point(93, 15);
-            prgsBar.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            prgsBar.Location = new System.Drawing.Point(116, 19);
+            prgsBar.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             prgsBar.Name = "prgsBar";
-            prgsBar.Size = new System.Drawing.Size(646, 42);
+            prgsBar.Size = new System.Drawing.Size(808, 52);
             prgsBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             prgsBar.TabIndex = 5;
             prgsBar.UseWaitCursor = true;
@@ -52,34 +53,38 @@
             // prgLbl
             // 
             prgLbl.AutoSize = true;
-            prgLbl.Location = new System.Drawing.Point(105, 61);
+            prgLbl.Location = new System.Drawing.Point(131, 76);
+            prgLbl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             prgLbl.Name = "prgLbl";
-            prgLbl.Size = new System.Drawing.Size(0, 20);
+            prgLbl.Size = new System.Drawing.Size(0, 25);
             prgLbl.TabIndex = 4;
             // 
             // msgLbl
             // 
             msgLbl.AutoSize = true;
-            msgLbl.Location = new System.Drawing.Point(13, 99);
+            msgLbl.Location = new System.Drawing.Point(16, 124);
+            msgLbl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             msgLbl.Name = "msgLbl";
-            msgLbl.Size = new System.Drawing.Size(0, 20);
+            msgLbl.Size = new System.Drawing.Size(0, 25);
             msgLbl.TabIndex = 6;
             // 
             // sucLbl
             // 
             sucLbl.AutoSize = true;
-            sucLbl.Location = new System.Drawing.Point(452, 61);
+            sucLbl.Location = new System.Drawing.Point(565, 76);
+            sucLbl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             sucLbl.Name = "sucLbl";
-            sucLbl.Size = new System.Drawing.Size(96, 20);
+            sucLbl.Size = new System.Drawing.Size(116, 25);
             sucLbl.TabIndex = 7;
             sucLbl.Text = "0 Succeeded.";
             // 
             // errLbl
             // 
             errLbl.AutoSize = true;
-            errLbl.Location = new System.Drawing.Point(572, 61);
+            errLbl.Location = new System.Drawing.Point(715, 76);
+            errLbl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             errLbl.Name = "errLbl";
-            errLbl.Size = new System.Drawing.Size(63, 20);
+            errLbl.Size = new System.Drawing.Size(76, 25);
             errLbl.TabIndex = 8;
             errLbl.Text = "0 Failed.";
             // 
@@ -87,26 +92,39 @@
             // 
             imgPcBx.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             imgPcBx.Image = (System.Drawing.Image)resources.GetObject("imgPcBx.Image");
-            imgPcBx.Location = new System.Drawing.Point(13, 15);
-            imgPcBx.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            imgPcBx.Location = new System.Drawing.Point(16, 19);
+            imgPcBx.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             imgPcBx.Name = "imgPcBx";
-            imgPcBx.Size = new System.Drawing.Size(74, 66);
+            imgPcBx.Size = new System.Drawing.Size(92, 82);
             imgPcBx.TabIndex = 9;
             imgPcBx.TabStop = false;
             // 
             // totEvtLbl
             // 
             totEvtLbl.AutoSize = true;
-            totEvtLbl.Location = new System.Drawing.Point(636, 61);
+            totEvtLbl.Location = new System.Drawing.Point(795, 76);
+            totEvtLbl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             totEvtLbl.Name = "totEvtLbl";
-            totEvtLbl.Size = new System.Drawing.Size(0, 20);
+            totEvtLbl.Size = new System.Drawing.Size(0, 25);
             totEvtLbl.TabIndex = 10;
+            // 
+            // shutdownChkBx
+            // 
+            shutdownChkBx.AutoSize = true;
+            shutdownChkBx.Location = new System.Drawing.Point(681, 164);
+            shutdownChkBx.Name = "shutdownChkBx";
+            shutdownChkBx.Size = new System.Drawing.Size(243, 29);
+            shutdownChkBx.TabIndex = 11;
+            shutdownChkBx.Text = "Shoutdown After Clearing";
+            shutdownChkBx.UseVisualStyleBackColor = true;
+            shutdownChkBx.CheckedChanged += shutdownChkBx_CheckedChanged;
             // 
             // EventClearForm
             // 
-            AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
+            AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(751, 144);
+            ClientSize = new System.Drawing.Size(939, 208);
+            Controls.Add(shutdownChkBx);
             Controls.Add(totEvtLbl);
             Controls.Add(imgPcBx);
             Controls.Add(errLbl);
@@ -116,7 +134,7 @@
             Controls.Add(prgLbl);
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
-            Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "EventClearForm";
@@ -136,5 +154,6 @@
         private System.Windows.Forms.Label errLbl;
         private System.Windows.Forms.PictureBox imgPcBx;
         private System.Windows.Forms.Label totEvtLbl;
+        private System.Windows.Forms.CheckBox shutdownChkBx;
     }
 }
