@@ -32,6 +32,9 @@ namespace Common_Tasks
             DatabaseManager.DeleteExpiredSchedules();
             _ = LoadTimer();
             
+            // Set initial button states based on database state
+            UpdateButtonStatesBasedOnDatabase();
+            
             try
             {
                 toastNotification = new ToastNotification();
@@ -261,8 +264,8 @@ namespace Common_Tasks
                 // Save both the shutdown time and the original scheduling time to the database
                 DatabaseManager.SaveShutdownSchedule(DateTime.Now, shutdownTime);
                 
-                UpdateCancelButtonState(true);
-                UpdateShutdownButtonState(false);
+                // Update button states based on database
+                UpdateButtonStatesBasedOnDatabase();
                 _ = LoadTimer();
                 toastNotification.Show("Shutdown scheduled.", "Scheduled", true);
             }
@@ -277,8 +280,9 @@ namespace Common_Tasks
             {
                 isShutdownCancelled = true;
                 DatabaseManager.DeleteAllActiveSchedules();
-                UpdateCancelButtonState(false);
-                UpdateShutdownButtonState(true);
+                
+                // Update button states based on database
+                UpdateButtonStatesBasedOnDatabase();
                 shtDwnTmLbl.Text = string.Empty;
 
                 ProcessStartInfo psi = new ProcessStartInfo
@@ -313,17 +317,17 @@ namespace Common_Tasks
             
             if (enabled)
             {
-                // Restore original button appearance
-                ShutdownBtn.BackColor = System.Drawing.Color.FromArgb(0, 130, 135);
+                // Restore original button appearance - Windows 11 accent blue
+                ShutdownBtn.BackColor = System.Drawing.Color.FromArgb(0, 99, 177);
                 ShutdownBtn.ForeColor = System.Drawing.Color.White;
                 ShutdownBtn.FlatAppearance.BorderColor = ShutdownBtn.BackColor;
             }
             else
             {
-                // Apply disabled style
-                ShutdownBtn.BackColor = System.Drawing.Color.FromArgb(180, 180, 180);
-                ShutdownBtn.ForeColor = System.Drawing.Color.FromArgb(120, 120, 120);
-                ShutdownBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(160, 160, 160);
+                // Apply disabled style - Windows 11 disabled button
+                ShutdownBtn.BackColor = System.Drawing.Color.FromArgb(233, 233, 233);
+                ShutdownBtn.ForeColor = System.Drawing.Color.FromArgb(153, 153, 153);
+                ShutdownBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(233, 233, 233);
             }
         }
 
@@ -333,17 +337,39 @@ namespace Common_Tasks
             
             if (enabled)
             {
-                // Restore original button appearance
-                CancelBtn.BackColor = System.Drawing.Color.FromArgb(192, 0, 0);
+                // Restore original button appearance - Windows 11 accent blue
+                CancelBtn.BackColor = System.Drawing.Color.FromArgb(0, 99, 177);
                 CancelBtn.ForeColor = System.Drawing.Color.White;
                 CancelBtn.FlatAppearance.BorderColor = CancelBtn.BackColor;
             }
             else
             {
-                // Apply disabled style
-                CancelBtn.BackColor = System.Drawing.Color.FromArgb(180, 180, 180);
-                CancelBtn.ForeColor = System.Drawing.Color.FromArgb(120, 120, 120);
-                CancelBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(160, 160, 160);
+                // Apply disabled style - Windows 11 disabled button
+                CancelBtn.BackColor = System.Drawing.Color.FromArgb(233, 233, 233);
+                CancelBtn.ForeColor = System.Drawing.Color.FromArgb(153, 153, 153);
+                CancelBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(233, 233, 233);
+            }
+        }
+        
+        /// <summary>
+        /// Updates button states based on whether there are active schedules in the database
+        /// </summary>
+        private void UpdateButtonStatesBasedOnDatabase()
+        {
+            // Check if there's an active schedule in the database
+            var activeSchedule = DatabaseManager.GetActiveShutdownSchedule();
+            
+            if (activeSchedule == null)
+            {
+                // No active schedule - enable Shutdown button, disable Cancel button
+                UpdateShutdownButtonState(true);
+                UpdateCancelButtonState(false);
+            }
+            else
+            {
+                // Active schedule exists - disable Shutdown button, enable Cancel button
+                UpdateShutdownButtonState(false);
+                UpdateCancelButtonState(true);
             }
         }
 
