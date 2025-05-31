@@ -12,6 +12,8 @@ namespace Common_Tasks
     {
         private bool eventClearFormOpen = false;
         public event Action EventClearFormClosed;
+        public event EventHandler<Message> MessageReceived;
+        public NotifyIcon TaskTrayIcon => taskTrayIcon;
         private bool isShutdownCancelled = false;
         private Size defaultFormSize;
         private ToastNotification toastNotification;
@@ -373,14 +375,14 @@ namespace Common_Tasks
             }
         }
 
-        private void RestoreFormSize()
+        public void RestoreFormSize()
         {
             Point currentLocation = Location;
             ClientSize = defaultFormSize;
             Location = currentLocation; 
         }
 
-        private void RestorePanelSize()
+        public void RestorePanelSize()
         {
 
             timerPanel.Size = defaultPanelSize;
@@ -420,7 +422,7 @@ namespace Common_Tasks
             }
         }
 
-        private void OpenEventClearForm()
+        public void OpenEventClearForm()
         {
             ClrEvntBtn.Enabled = false;
             EventClearForm eventClearForm = new EventClearForm();
@@ -455,8 +457,27 @@ namespace Common_Tasks
                 // Start the new process
                 Process.Start(processInfo);
 
-                // Close the current process
-                Application.Exit();
+                // Clean up resources before exiting
+                if (shutdownToastNotification != null)
+                {
+                    shutdownToastNotification.Dispose();
+                }
+                
+                if (toastNotification != null)
+                {
+                    toastNotification.Dispose();
+                }
+                
+                // Hide the form and tray icon
+                this.Hide();
+                taskTrayIcon.Visible = false;
+                
+                // Force garbage collection to release resources
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                
+                // Exit the application completely
+                Environment.Exit(0);
             }
             catch (Exception ex)
             {
@@ -569,6 +590,21 @@ namespace Common_Tasks
                 ShowInTaskbar = false;
                 taskTrayIcon.Visible = true;
             }
+        }
+        
+        /// <summary>
+        /// Override the window procedure to handle custom messages
+        /// </summary>
+        protected override void WndProc(ref Message m)
+        {
+            // Allow subscribers to handle the message first
+            if (MessageReceived != null)
+            {
+                MessageReceived.Invoke(this, m);
+            }
+            
+            // Pass the message to the base class
+            base.WndProc(ref m);
         }
     }
 }
