@@ -236,40 +236,6 @@ namespace Common_Tasks
             }
         }
         
-        /// <summary>
-        /// Tests if the application has write access to the specified folder
-        /// </summary>
-        /// <param name="folderPath">The folder to test</param>
-        /// <exception cref="UnauthorizedAccessException">Thrown if the application doesn't have write access</exception>
-        private static void TestDatabaseAccess(string folderPath)
-        {
-            try
-            {
-                // Try to create a temporary file to test write access
-                string testFile = Path.Combine(folderPath, "write_test.tmp");
-                File.WriteAllText(testFile, "Test");
-                File.Delete(testFile);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                throw; // Re-throw to be caught by the caller
-            }
-            catch (IOException ex)
-            {
-                // If it's an access issue, convert to UnauthorizedAccessException
-                if (ex.Message.Contains("access") || ex.Message.Contains("denied"))
-                {
-                    throw new UnauthorizedAccessException("Cannot write to the installation folder", ex);
-                }
-                // Otherwise just log it but continue
-                Console.WriteLine($"IO error testing database access: {ex.Message}");
-            }
-            catch (Exception ex)
-            {
-                // Log other exceptions but continue
-                Console.WriteLine($"Error testing database access: {ex.Message}");
-            }
-        }
 
         /// <summary>
         /// Checks if there is an active shutdown schedule
