@@ -47,6 +47,9 @@ namespace Common_Tasks
             taskTrayIcon = new System.Windows.Forms.NotifyIcon(components);
             trayMenu = new System.Windows.Forms.ContextMenuStrip(components);
             ExitTrayMenu = new System.Windows.Forms.ToolStripMenuItem();
+            OptionmenuStrip = new System.Windows.Forms.MenuStrip();
+            optionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             groupBox2.SuspendLayout();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)HoursBoard).BeginInit();
@@ -54,13 +57,16 @@ namespace Common_Tasks
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             timerPanel.SuspendLayout();
             trayMenu.SuspendLayout();
+            OptionmenuStrip.SuspendLayout();
             SuspendLayout();
             // 
             // groupBox2
             // 
+            groupBox2.BackColor = System.Drawing.Color.FromArgb(251, 251, 251);
             groupBox2.Controls.Add(ClrEvntBtn);
-            groupBox2.Font = new System.Drawing.Font("Segoe UI Variable", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            groupBox2.Location = new System.Drawing.Point(160, 15);
+            groupBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            groupBox2.ForeColor = System.Drawing.Color.FromArgb(32, 32, 32);
+            groupBox2.Location = new System.Drawing.Point(160, 21);
             groupBox2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             groupBox2.Name = "groupBox2";
             groupBox2.Padding = new System.Windows.Forms.Padding(12, 16, 12, 12);
@@ -68,17 +74,15 @@ namespace Common_Tasks
             groupBox2.TabIndex = 16;
             groupBox2.TabStop = false;
             groupBox2.Text = "Event Viewer";
-            groupBox2.ForeColor = System.Drawing.Color.FromArgb(32, 32, 32);  // Windows 11 dark text
-            groupBox2.BackColor = System.Drawing.Color.FromArgb(251, 251, 251);  // Windows 11 card background
             // 
             // ClrEvntBtn
             // 
-            ClrEvntBtn.BackColor = System.Drawing.Color.FromArgb(0, 99, 177);  // Windows 11 accent blue
-            ClrEvntBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            ClrEvntBtn.Font = new System.Drawing.Font("Segoe UI Variable", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            ClrEvntBtn.ForeColor = System.Drawing.Color.White;
-            ClrEvntBtn.FlatAppearance.BorderSize = 0;
+            ClrEvntBtn.BackColor = System.Drawing.Color.FromArgb(0, 99, 177);
             ClrEvntBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(0, 99, 177);
+            ClrEvntBtn.FlatAppearance.BorderSize = 0;
+            ClrEvntBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            ClrEvntBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            ClrEvntBtn.ForeColor = System.Drawing.Color.White;
             ClrEvntBtn.Image = (System.Drawing.Image)resources.GetObject("ClrEvntBtn.Image");
             ClrEvntBtn.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             ClrEvntBtn.Location = new System.Drawing.Point(14, 55);
@@ -94,13 +98,15 @@ namespace Common_Tasks
             // 
             // groupBox1
             // 
+            groupBox1.BackColor = System.Drawing.Color.FromArgb(251, 251, 251);
             groupBox1.Controls.Add(label2);
             groupBox1.Controls.Add(HoursBoard);
             groupBox1.Controls.Add(MinuteBoard);
             groupBox1.Controls.Add(label1);
             groupBox1.Controls.Add(CancelBtn);
             groupBox1.Controls.Add(ShutdownBtn);
-            groupBox1.Font = new System.Drawing.Font("Segoe UI Variable", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            groupBox1.ForeColor = System.Drawing.Color.FromArgb(32, 32, 32);
             groupBox1.Location = new System.Drawing.Point(12, 195);
             groupBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             groupBox1.Name = "groupBox1";
@@ -109,64 +115,62 @@ namespace Common_Tasks
             groupBox1.TabIndex = 18;
             groupBox1.TabStop = false;
             groupBox1.Text = "Schedule Power Management";
-            groupBox1.ForeColor = System.Drawing.Color.FromArgb(32, 32, 32);  // Windows 11 dark text
-            groupBox1.BackColor = System.Drawing.Color.FromArgb(251, 251, 251);  // Windows 11 card background
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Font = new System.Drawing.Font("Segoe UI Variable", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            label2.ForeColor = System.Drawing.Color.FromArgb(32, 32, 32);
             label2.Location = new System.Drawing.Point(81, 46);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(43, 16);
             label2.TabIndex = 12;
             label2.Text = "Hours";
-            label2.ForeColor = System.Drawing.Color.FromArgb(32, 32, 32);
             // 
             // HoursBoard
             // 
-            HoursBoard.Font = new System.Drawing.Font("Segoe UI Variable", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            HoursBoard.BackColor = System.Drawing.Color.FromArgb(251, 251, 251);
+            HoursBoard.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            HoursBoard.ForeColor = System.Drawing.Color.FromArgb(32, 32, 32);
             HoursBoard.Location = new System.Drawing.Point(26, 38);
             HoursBoard.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             HoursBoard.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
             HoursBoard.Name = "HoursBoard";
             HoursBoard.Size = new System.Drawing.Size(49, 22);
             HoursBoard.TabIndex = 11;
-            HoursBoard.BackColor = System.Drawing.Color.FromArgb(251, 251, 251);
-            HoursBoard.ForeColor = System.Drawing.Color.FromArgb(32, 32, 32);
             // 
             // MinuteBoard
             // 
-            MinuteBoard.Font = new System.Drawing.Font("Segoe UI Variable", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            MinuteBoard.BackColor = System.Drawing.Color.FromArgb(251, 251, 251);
+            MinuteBoard.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            MinuteBoard.ForeColor = System.Drawing.Color.FromArgb(32, 32, 32);
             MinuteBoard.Location = new System.Drawing.Point(130, 38);
             MinuteBoard.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             MinuteBoard.Maximum = new decimal(new int[] { 60, 0, 0, 0 });
             MinuteBoard.Name = "MinuteBoard";
             MinuteBoard.Size = new System.Drawing.Size(49, 22);
             MinuteBoard.TabIndex = 10;
-            MinuteBoard.BackColor = System.Drawing.Color.FromArgb(251, 251, 251);
-            MinuteBoard.ForeColor = System.Drawing.Color.FromArgb(32, 32, 32);
             MinuteBoard.ValueChanged += MinuteBoard_ValueChanged;
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Font = new System.Drawing.Font("Segoe UI Variable", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            label1.ForeColor = System.Drawing.Color.FromArgb(32, 32, 32);
             label1.Location = new System.Drawing.Point(185, 46);
             label1.Name = "label1";
             label1.Size = new System.Drawing.Size(53, 16);
             label1.TabIndex = 9;
             label1.Text = "Minutes";
-            label1.ForeColor = System.Drawing.Color.FromArgb(32, 32, 32);
             // 
             // CancelBtn
             // 
-            CancelBtn.BackColor = System.Drawing.Color.FromArgb(0, 99, 177);  // Windows 11 accent blue
-            CancelBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            CancelBtn.Font = new System.Drawing.Font("Segoe UI Variable", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            CancelBtn.ForeColor = System.Drawing.Color.White;
-            CancelBtn.FlatAppearance.BorderSize = 0;
+            CancelBtn.BackColor = System.Drawing.Color.FromArgb(0, 99, 177);
             CancelBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(0, 99, 177);
+            CancelBtn.FlatAppearance.BorderSize = 0;
+            CancelBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            CancelBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            CancelBtn.ForeColor = System.Drawing.Color.White;
             CancelBtn.Location = new System.Drawing.Point(132, 83);
             CancelBtn.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             CancelBtn.Name = "CancelBtn";
@@ -178,12 +182,12 @@ namespace Common_Tasks
             // 
             // ShutdownBtn
             // 
-            ShutdownBtn.BackColor = System.Drawing.Color.FromArgb(0, 99, 177);  // Windows 11 accent blue
-            ShutdownBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            ShutdownBtn.Font = new System.Drawing.Font("Segoe UI Variable", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            ShutdownBtn.ForeColor = System.Drawing.Color.White;
-            ShutdownBtn.FlatAppearance.BorderSize = 0;
+            ShutdownBtn.BackColor = System.Drawing.Color.FromArgb(0, 99, 177);
             ShutdownBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(0, 99, 177);
+            ShutdownBtn.FlatAppearance.BorderSize = 0;
+            ShutdownBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            ShutdownBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            ShutdownBtn.ForeColor = System.Drawing.Color.White;
             ShutdownBtn.Location = new System.Drawing.Point(26, 83);
             ShutdownBtn.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             ShutdownBtn.Name = "ShutdownBtn";
@@ -195,23 +199,23 @@ namespace Common_Tasks
             // 
             // remTmLbl
             // 
-            remTmLbl.Font = new System.Drawing.Font("Segoe UI Variable", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            remTmLbl.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            remTmLbl.ForeColor = System.Drawing.Color.FromArgb(32, 32, 32);
             remTmLbl.Location = new System.Drawing.Point(14, 66);
             remTmLbl.MaximumSize = new System.Drawing.Size(295, 0);
             remTmLbl.Name = "remTmLbl";
             remTmLbl.Size = new System.Drawing.Size(290, 0);
             remTmLbl.TabIndex = 14;
-            remTmLbl.ForeColor = System.Drawing.Color.FromArgb(32, 32, 32);
             // 
             // shtDwnTmLbl
             // 
             shtDwnTmLbl.AutoSize = true;
-            shtDwnTmLbl.Font = new System.Drawing.Font("Segoe UI Variable", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            shtDwnTmLbl.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            shtDwnTmLbl.ForeColor = System.Drawing.Color.FromArgb(32, 32, 32);
             shtDwnTmLbl.Location = new System.Drawing.Point(14, 9);
             shtDwnTmLbl.Name = "shtDwnTmLbl";
             shtDwnTmLbl.Size = new System.Drawing.Size(0, 18);
             shtDwnTmLbl.TabIndex = 13;
-            shtDwnTmLbl.ForeColor = System.Drawing.Color.FromArgb(32, 32, 32);
             // 
             // pictureBox1
             // 
@@ -228,15 +232,15 @@ namespace Common_Tasks
             // 
             // timerPanel
             // 
+            timerPanel.BackColor = System.Drawing.Color.FromArgb(251, 251, 251);
             timerPanel.Controls.Add(remTmLbl);
             timerPanel.Controls.Add(shtDwnTmLbl);
-            timerPanel.Font = new System.Drawing.Font("Segoe UI Variable", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            timerPanel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             timerPanel.Location = new System.Drawing.Point(2, 349);
             timerPanel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             timerPanel.Name = "timerPanel";
             timerPanel.Size = new System.Drawing.Size(315, 135);
             timerPanel.TabIndex = 20;
-            timerPanel.BackColor = System.Drawing.Color.FromArgb(251, 251, 251);  // Windows 11 card background
             // 
             // taskTrayIcon
             // 
@@ -260,18 +264,45 @@ namespace Common_Tasks
             ExitTrayMenu.Text = "Exit";
             ExitTrayMenu.Click += ExitTrayMenu_Click;
             // 
+            // OptionmenuStrip
+            // 
+            OptionmenuStrip.Dock = System.Windows.Forms.DockStyle.Bottom;
+            OptionmenuStrip.ImageScalingSize = new System.Drawing.Size(20, 20);
+            OptionmenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { optionToolStripMenuItem });
+            OptionmenuStrip.Location = new System.Drawing.Point(0, 476);
+            OptionmenuStrip.Name = "OptionmenuStrip";
+            OptionmenuStrip.Size = new System.Drawing.Size(328, 28);
+            OptionmenuStrip.TabIndex = 21;
+            OptionmenuStrip.Text = "OptionmenuStrip";
+            // 
+            // optionToolStripMenuItem
+            // 
+            optionToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { exitToolStripMenuItem });
+            optionToolStripMenuItem.Name = "optionToolStripMenuItem";
+            optionToolStripMenuItem.Size = new System.Drawing.Size(69, 24);
+            optionToolStripMenuItem.Text = "Option";
+            // 
+            // exitToolStripMenuItem
+            // 
+            exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            exitToolStripMenuItem.Size = new System.Drawing.Size(116, 26);
+            exitToolStripMenuItem.Text = "Exit";
+            exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            BackColor = System.Drawing.Color.FromArgb(243, 243, 243);  // Windows 11 light background
+            BackColor = System.Drawing.Color.FromArgb(243, 243, 243);
             ClientSize = new System.Drawing.Size(328, 504);
+            Controls.Add(OptionmenuStrip);
             Controls.Add(timerPanel);
             Controls.Add(pictureBox1);
             Controls.Add(groupBox1);
             Controls.Add(groupBox2);
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
+            MainMenuStrip = OptionmenuStrip;
             Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             MaximizeBox = false;
             Name = "MainForm";
@@ -286,7 +317,10 @@ namespace Common_Tasks
             timerPanel.ResumeLayout(false);
             timerPanel.PerformLayout();
             trayMenu.ResumeLayout(false);
+            OptionmenuStrip.ResumeLayout(false);
+            OptionmenuStrip.PerformLayout();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -307,6 +341,9 @@ namespace Common_Tasks
         private System.Windows.Forms.NotifyIcon taskTrayIcon;
         private System.Windows.Forms.ToolStripMenuItem ExitTrayMenu;
         private System.Windows.Forms.ContextMenuStrip trayMenu;
+        private System.Windows.Forms.MenuStrip OptionmenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem optionToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
     }
 }
 

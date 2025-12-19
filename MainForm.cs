@@ -29,14 +29,14 @@ namespace Common_Tasks
             defaultPanelSize = timerPanel.Size;
             defaultLabelSize = remTmLbl.Size;
             taskTrayIcon.Text = "Common Tasks";
-            
+
             InitializeShutdownNotification();
             DatabaseManager.DeleteExpiredSchedules();
             _ = LoadTimer();
-            
+
             // Set initial button states based on database state
             UpdateButtonStatesBasedOnDatabase();
-            
+
             try
             {
                 toastNotification = new ToastNotification();
@@ -47,17 +47,17 @@ namespace Common_Tasks
                 // Handle the exception without using toast notification
                 MessageBox.Show($"Error initializing toast notification: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            
+
             // Check for command line arguments
             string[] args = Environment.GetCommandLineArgs();
-            
+
             // Handle delayed start to avoid instance conflicts
             if (args.Length > 1 && args.Contains("--delayed-start"))
             {
                 // Wait longer to ensure previous instance is fully closed
                 Timer delayTimer = new Timer();
                 delayTimer.Interval = 3000; // 3 seconds should be enough
-                delayTimer.Tick += (s, e) => 
+                delayTimer.Tick += (s, e) =>
                 {
                     delayTimer.Stop();
                     // Continue with normal initialization
@@ -70,7 +70,7 @@ namespace Common_Tasks
                 // Delay the opening of the form slightly to ensure the UI is fully loaded
                 Timer startupTimer = new Timer();
                 startupTimer.Interval = 500;
-                startupTimer.Tick += (s, e) => 
+                startupTimer.Tick += (s, e) =>
                 {
                     startupTimer.Stop();
                     OpenEventClearForm();
@@ -109,7 +109,7 @@ namespace Common_Tasks
             timerPanel.Controls.Add(shutdownToastNotification);
             shutdownToastNotification.Dock = DockStyle.Fill;
             shutdownToastNotification.BringToFront();
-            shutdownToastNotification.Visible = false; 
+            shutdownToastNotification.Visible = false;
         }
 
         private async Task LoadTimer()
@@ -135,10 +135,10 @@ namespace Common_Tasks
 
                 shtDwnTmLbl.Text = string.Empty;
                 remTmLbl.Text = string.Empty;
-                
+
                 UpdateShutdownButtonState(false);
                 UpdateCancelButtonState(true);
-             
+
                 shutdownToastNotification.Visible = true;
                 shutdownToastNotification.BringToFront();
 
@@ -178,7 +178,7 @@ namespace Common_Tasks
                     // No active schedule found
                     return;
                 }
-                
+
                 DateTime startTime = schedule.Item1;
                 DateTime shutdownTime = schedule.Item2;
 
@@ -188,7 +188,7 @@ namespace Common_Tasks
                     {
                         DatabaseManager.DeleteAllActiveSchedules();
                         shutdownToastNotification.HideShutdownCountdown();
-                        return; 
+                        return;
                     }
 
                     TimeSpan remainingTime = shutdownTime - DateTime.Now;
@@ -265,7 +265,7 @@ namespace Common_Tasks
 
                 // Save both the shutdown time and the original scheduling time to the database
                 DatabaseManager.SaveShutdownSchedule(DateTime.Now, shutdownTime);
-                
+
                 // Update button states based on database
                 UpdateButtonStatesBasedOnDatabase();
                 _ = LoadTimer();
@@ -282,7 +282,7 @@ namespace Common_Tasks
             {
                 isShutdownCancelled = true;
                 DatabaseManager.DeleteAllActiveSchedules();
-                
+
                 // Update button states based on database
                 UpdateButtonStatesBasedOnDatabase();
                 shtDwnTmLbl.Text = string.Empty;
@@ -316,7 +316,7 @@ namespace Common_Tasks
         private void UpdateShutdownButtonState(bool enabled)
         {
             ShutdownBtn.Enabled = enabled;
-            
+
             if (enabled)
             {
                 // Restore original button appearance - Windows 11 accent blue
@@ -336,7 +336,7 @@ namespace Common_Tasks
         private void UpdateCancelButtonState(bool enabled)
         {
             CancelBtn.Enabled = enabled;
-            
+
             if (enabled)
             {
                 // Restore original button appearance - Windows 11 accent blue
@@ -352,7 +352,7 @@ namespace Common_Tasks
                 CancelBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(233, 233, 233);
             }
         }
-        
+
         /// <summary>
         /// Updates button states based on whether there are active schedules in the database
         /// </summary>
@@ -360,7 +360,7 @@ namespace Common_Tasks
         {
             // Check if there's an active schedule in the database
             var activeSchedule = DatabaseManager.GetActiveShutdownSchedule();
-            
+
             if (activeSchedule == null)
             {
                 // No active schedule - enable Shutdown button, disable Cancel button
@@ -379,7 +379,7 @@ namespace Common_Tasks
         {
             Point currentLocation = Location;
             ClientSize = defaultFormSize;
-            Location = currentLocation; 
+            Location = currentLocation;
         }
 
         public void RestorePanelSize()
@@ -402,7 +402,7 @@ namespace Common_Tasks
                         RestartAsAdmin("--clear-events");
                         return;
                     }
-                    
+
                     // If we're already running as admin, show the form
                     OpenEventClearForm();
                 }
@@ -462,20 +462,20 @@ namespace Common_Tasks
                 {
                     shutdownToastNotification.Dispose();
                 }
-                
+
                 if (toastNotification != null)
                 {
                     toastNotification.Dispose();
                 }
-                
+
                 // Hide the form and tray icon
                 this.Hide();
                 taskTrayIcon.Visible = false;
-                
+
                 // Force garbage collection to release resources
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
-                
+
                 // Exit the application completely
                 Environment.Exit(0);
             }
@@ -514,20 +514,20 @@ namespace Common_Tasks
                 {
                     shutdownToastNotification.Dispose();
                 }
-                
+
                 if (toastNotification != null)
                 {
                     toastNotification.Dispose();
                 }
-                
+
                 // Hide the form and tray icon
                 this.Hide();
                 taskTrayIcon.Visible = false;
-                
+
                 // Force garbage collection to release resources
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
-                
+
                 // Exit the application
                 Environment.Exit(0);
             }
@@ -549,7 +549,7 @@ namespace Common_Tasks
             ClrEvntBtn.Enabled = true;
             eventClearFormOpen = false;
             EventClearFormClosed?.Invoke();
-            
+
             // If we're running as admin, restart in normal mode
             if (IsRunningAsAdmin())
             {
@@ -591,7 +591,7 @@ namespace Common_Tasks
                 taskTrayIcon.Visible = true;
             }
         }
-        
+
         /// <summary>
         /// Override the window procedure to handle custom messages
         /// </summary>
@@ -602,9 +602,14 @@ namespace Common_Tasks
             {
                 MessageReceived.Invoke(this, m);
             }
-            
+
             // Pass the message to the base class
             base.WndProc(ref m);
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
         }
     }
 }
