@@ -50,6 +50,7 @@ namespace Common_Tasks
             OptionmenuStrip = new System.Windows.Forms.MenuStrip();
             optionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            clearNetworkListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             groupBox2.SuspendLayout();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)HoursBoard).BeginInit();
@@ -277,7 +278,7 @@ namespace Common_Tasks
             // 
             // optionToolStripMenuItem
             // 
-            optionToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { exitToolStripMenuItem });
+            optionToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { exitToolStripMenuItem, clearNetworkListToolStripMenuItem });
             optionToolStripMenuItem.Name = "optionToolStripMenuItem";
             optionToolStripMenuItem.Size = new System.Drawing.Size(69, 24);
             optionToolStripMenuItem.Text = "Option";
@@ -285,9 +286,16 @@ namespace Common_Tasks
             // exitToolStripMenuItem
             // 
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new System.Drawing.Size(116, 26);
+            exitToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
+            // 
+            // clearNetworkListToolStripMenuItem
+            // 
+            clearNetworkListToolStripMenuItem.Name = "clearNetworkListToolStripMenuItem";
+            clearNetworkListToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            clearNetworkListToolStripMenuItem.Text = "Clear Network List";
+            clearNetworkListToolStripMenuItem.Click += clearNetworkListToolStripMenuItem_Click;
             // 
             // MainForm
             // 
@@ -344,6 +352,7 @@ namespace Common_Tasks
         private System.Windows.Forms.MenuStrip OptionmenuStrip;
         private System.Windows.Forms.ToolStripMenuItem optionToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem clearNetworkListToolStripMenuItem;
     }
 }
 

@@ -1,10 +1,11 @@
+using Microsoft.Win32;
+using SelfSampleProRAD_DB.UserControls;
 using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using SelfSampleProRAD_DB.UserControls;
 
 namespace Common_Tasks
 {
@@ -610,6 +611,28 @@ namespace Common_Tasks
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void clearNetworkListToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (RegistryKey profilesKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\NetworkList\Profiles", true))
+            {
+                if (profilesKey != null)
+                {
+                    string[] subKeyNames = profilesKey.GetSubKeyNames();
+                    foreach (string subKeyName in subKeyNames)
+                    {
+                        try
+                        {
+                            profilesKey.DeleteSubKeyTree(subKeyName, false);
+                        }
+                        catch (Exception ex)
+                        {
+                            toastNotification.Show($"Failed to delete {subKeyName}: {ex.Message}", "WARNING", false);
+                        }
+                    }
+                }
+            }
         }
     }
 }
