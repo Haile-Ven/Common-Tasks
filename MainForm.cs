@@ -79,6 +79,19 @@ namespace Common_Tasks
                 };
                 startupTimer.Start();
             }
+            // Handle view network command
+            else if (args.Length > 1 && args.Contains("--view-network"))
+            {
+                // Delay slightly to ensure UI is fully loaded
+                Timer startupTimer = new Timer();
+                startupTimer.Interval = 500;
+                startupTimer.Tick += (s, e) =>
+                {
+                    startupTimer.Stop();
+                    ShowViewNetworkMenu();
+                };
+                startupTimer.Start();
+            }
             // Handle clear network command
             else if (args.Length > 1 && args.Contains("--clear-network"))
             {
@@ -99,6 +112,7 @@ namespace Common_Tasks
                 };
                 startupTimer.Start();
             }
+
         }
 
         private void ExitItem_Click(object sender, EventArgs e)
@@ -710,12 +724,74 @@ namespace Common_Tasks
             return networks;
         }
 
-        private void clearNetworkListToolStripMenuItem_MouseHover(object sender, EventArgs e)
+        private void ShowViewNetworkMenu()
         {
+            // Get networks and populate the menu
             var networks = GetAllNetworkList();
-            foreach (var network in networks)
+            
+            // Clear existing items except the header/separator if any
+            viewNetworkListToolStripMenuItem.DropDownItems.Clear();
+            
+            if (networks.Count == 0)
             {
-                clearNetworkListToolStripMenuItem.DropDownItems.Add($"{network.ProfileName}");
+                ToolStripMenuItem emptyItem = new ToolStripMenuItem("No networks found");
+                emptyItem.Enabled = false;
+                viewNetworkListToolStripMenuItem.DropDownItems.Add(emptyItem);
+            }
+            else
+            {
+                foreach (var network in networks)
+                {
+                    ToolStripMenuItem networkItem = new ToolStripMenuItem(network.ProfileName);
+                    networkItem.ToolTipText = $"GUID: {network.Guid}";
+                    viewNetworkListToolStripMenuItem.DropDownItems.Add(networkItem);
+                }
+            }
+            
+            // Add separator and return to normal mode option
+            viewNetworkListToolStripMenuItem.DropDownItems.Add(new ToolStripSeparator());
+            ToolStripMenuItem returnItem = new ToolStripMenuItem("Return to Normal Mode");
+            returnItem.Click += (s, e) =>
+            {
+                if (IsRunningAsAdmin())
+                {
+                    RestartWithNormalPrivileges();
+                }
+            };
+            viewNetworkListToolStripMenuItem.DropDownItems.Add(returnItem);
+            
+            // Show the menu
+            viewNetworkListToolStripMenuItem.ShowDropDown();
+        }
+
+        private void viewNetworkListToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Check if the current process has admin privileges
+            if (!IsRunningAsAdmin())
+            {
+                // Restart the application with admin privileges and pass command line argument
+                RestartAsAdmin("--view-network");
+                return;
+            }
+            ShowViewNetworkMenu();
+        }
+
+        protected override void OnDeactivate(EventArgs e)
+        {
+            base.OnDeactivate(e);
+            
+            // Check if we were launched with --view-network and should return to normal mode
+            string[] args = Environment.GetCommandLineArgs();
+            if (args.Contains("--view-network") && IsRunningAsAdmin())
+            {
+                // Small delay to ensure menu interactions complete
+                Task.Delay(500).ContinueWith(_ =>
+                {
+                    BeginInvoke(new Action(() =>
+                    {
+                        RestartWithNormalPrivileges();
+                    }));
+                });
             }
         }
     }
