@@ -1,6 +1,7 @@
 using Microsoft.Win32;
 using SelfSampleProRAD_DB.UserControls;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
@@ -75,6 +76,26 @@ namespace Common_Tasks
                 {
                     startupTimer.Stop();
                     OpenEventClearForm();
+                };
+                startupTimer.Start();
+            }
+            // Handle clear network command
+            else if (args.Length > 1 && args.Contains("--clear-network"))
+            {
+                // Delay the clearing slightly to ensure the UI is fully loaded
+                Timer startupTimer = new Timer();
+                startupTimer.Interval = 500;
+                startupTimer.Tick += async (s, e) =>
+                {
+                    startupTimer.Stop();
+                    ClearNetworkList();
+                    // Wait for toast to be visible before restarting
+                    await Task.Delay(2000);
+                    // Return to normal privileges after clearing
+                    if (IsRunningAsAdmin())
+                    {
+                        RestartWithNormalPrivileges();
+                    }
                 };
                 startupTimer.Start();
             }
@@ -615,6 +636,18 @@ namespace Common_Tasks
 
         private void clearNetworkListToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            // Check if the current process has admin privileges
+            if (!IsRunningAsAdmin())
+            {
+                // Restart the application with admin privileges and pass command line argument
+                RestartAsAdmin("--clear-network");
+                return;
+            }
+            ClearNetworkList();
+        }
+
+        private void ClearNetworkList()
+        {
             using (RegistryKey profilesKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\NetworkList\Profiles", true))
             {
                 if (profilesKey != null)
@@ -631,7 +664,58 @@ namespace Common_Tasks
                             toastNotification.Show($"Failed to delete {subKeyName}: {ex.Message}", "WARNING", false);
                         }
                     }
+                    toastNotification.Show($"Network list cleared. Deleted {subKeyNames.Length} profiles.", "SUCCESS", true);
                 }
+                else
+                {
+                    toastNotification.Show("Network profiles registry key not found.", "WARNING", false);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets all network profiles from the registry
+        /// </summary>
+        /// <returns>List of tuples containing (ProfileName, Guid) for each network</returns>
+        private List<(string ProfileName, string Guid)> GetAllNetworkList()
+        {
+            var networks = new List<(string ProfileName, string Guid)>();
+
+            using (RegistryKey profilesKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\NetworkList\Profiles", false))
+            {
+                if (profilesKey != null)
+                {
+                    string[] subKeyNames = profilesKey.GetSubKeyNames();
+                    foreach (string subKeyName in subKeyNames)
+                    {
+                        try
+                        {
+                            using (RegistryKey profileKey = profilesKey.OpenSubKey(subKeyName, false))
+                            {
+                                if (profileKey != null)
+                                {
+                                    string profileName = profileKey.GetValue("ProfileName")?.ToString() ?? "Unknown Network";
+                                    networks.Add((profileName, subKeyName));
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"Failed to read profile {subKeyName}: {ex.Message}");
+                        }
+                    }
+                }
+            }
+
+            return networks;
+        }
+
+        private void clearNetworkListToolStripMenuItem_MouseHover(object sender, EventArgs e)
+        {
+            var networks = GetAllNetworkList();
+            foreach (var network in networks)
+            {
+                clearNetworkListToolStripMenuItem.DropDownItems.Add($"{network.ProfileName}");
             }
         }
     }
