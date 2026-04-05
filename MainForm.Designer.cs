@@ -51,7 +51,6 @@ namespace Common_Tasks
             optionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             clearNetworkListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            viewNetworkListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             groupBox2.SuspendLayout();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)HoursBoard).BeginInit();
@@ -279,7 +278,7 @@ namespace Common_Tasks
             // 
             // optionToolStripMenuItem
             // 
-            optionToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { viewNetworkListToolStripMenuItem, clearNetworkListToolStripMenuItem, exitToolStripMenuItem });
+            optionToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { clearNetworkListToolStripMenuItem, exitToolStripMenuItem });
             optionToolStripMenuItem.Name = "optionToolStripMenuItem";
             optionToolStripMenuItem.Size = new System.Drawing.Size(69, 24);
             optionToolStripMenuItem.Text = "Option";
@@ -290,6 +289,7 @@ namespace Common_Tasks
             clearNetworkListToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             clearNetworkListToolStripMenuItem.Text = "Clear Network List";
             clearNetworkListToolStripMenuItem.Click += clearNetworkListToolStripMenuItem_Click;
+            clearNetworkListToolStripMenuItem.MouseHover += clearNetworkListToolStripMenuItem_MouseHover;
             // 
             // exitToolStripMenuItem
             // 
@@ -297,13 +297,6 @@ namespace Common_Tasks
             exitToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
-            // 
-            // viewNetworkListToolStripMenuItem
-            // 
-            viewNetworkListToolStripMenuItem.Name = "viewNetworkListToolStripMenuItem";
-            viewNetworkListToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
-            viewNetworkListToolStripMenuItem.Text = "View Network List";
-            viewNetworkListToolStripMenuItem.Click += viewNetworkListToolStripMenuItem_Click;
             // 
             // MainForm
             // 
@@ -361,7 +354,6 @@ namespace Common_Tasks
         private System.Windows.Forms.ToolStripMenuItem optionToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem clearNetworkListToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem viewNetworkListToolStripMenuItem;
     }
 }
 

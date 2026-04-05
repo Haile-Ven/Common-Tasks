@@ -23,6 +23,7 @@ namespace Common_Tasks
         private Point defaultFormLocation;
         private Size defaultPanelSize;
         private Size defaultLabelSize;
+
         public MainForm()
         {
             InitializeComponent();
@@ -728,15 +729,14 @@ namespace Common_Tasks
         {
             // Get networks and populate the menu
             var networks = GetAllNetworkList();
-            
+
             // Clear existing items except the header/separator if any
-            viewNetworkListToolStripMenuItem.DropDownItems.Clear();
-            
+            clearNetworkListToolStripMenuItem.DropDownItems.Clear();
             if (networks.Count == 0)
             {
                 ToolStripMenuItem emptyItem = new ToolStripMenuItem("No networks found");
                 emptyItem.Enabled = false;
-                viewNetworkListToolStripMenuItem.DropDownItems.Add(emptyItem);
+                clearNetworkListToolStripMenuItem.DropDownItems.Add(emptyItem);
             }
             else
             {
@@ -744,12 +744,12 @@ namespace Common_Tasks
                 {
                     ToolStripMenuItem networkItem = new ToolStripMenuItem(network.ProfileName);
                     networkItem.ToolTipText = $"GUID: {network.Guid}";
-                    viewNetworkListToolStripMenuItem.DropDownItems.Add(networkItem);
+                    clearNetworkListToolStripMenuItem.DropDownItems.Add(networkItem);
                 }
             }
-            
+
             // Add separator and return to normal mode option
-            viewNetworkListToolStripMenuItem.DropDownItems.Add(new ToolStripSeparator());
+            clearNetworkListToolStripMenuItem.DropDownItems.Add(new ToolStripSeparator());
             ToolStripMenuItem returnItem = new ToolStripMenuItem("Return to Normal Mode");
             returnItem.Click += (s, e) =>
             {
@@ -758,13 +758,17 @@ namespace Common_Tasks
                     RestartWithNormalPrivileges();
                 }
             };
-            viewNetworkListToolStripMenuItem.DropDownItems.Add(returnItem);
-            
+            clearNetworkListToolStripMenuItem.DropDownItems.Add(returnItem);
+
             // Show the menu
-            viewNetworkListToolStripMenuItem.ShowDropDown();
+            this.BeginInvoke(new Action(() =>
+            {
+                clearNetworkListToolStripMenuItem.ShowDropDown();
+            }));
+            //clearNetworkListToolStripMenuItem.ShowDropDown();
         }
 
-        private void viewNetworkListToolStripMenuItem_Click(object sender, EventArgs e)
+        private void clearNetworkListToolStripMenuItem_MouseHover(object sender, EventArgs e)
         {
             // Check if the current process has admin privileges
             if (!IsRunningAsAdmin())
@@ -774,25 +778,6 @@ namespace Common_Tasks
                 return;
             }
             ShowViewNetworkMenu();
-        }
-
-        protected override void OnDeactivate(EventArgs e)
-        {
-            base.OnDeactivate(e);
-            
-            // Check if we were launched with --view-network and should return to normal mode
-            string[] args = Environment.GetCommandLineArgs();
-            if (args.Contains("--view-network") && IsRunningAsAdmin())
-            {
-                // Small delay to ensure menu interactions complete
-                Task.Delay(500).ContinueWith(_ =>
-                {
-                    BeginInvoke(new Action(() =>
-                    {
-                        RestartWithNormalPrivileges();
-                    }));
-                });
-            }
         }
     }
 }
