@@ -19,13 +19,13 @@ namespace Common_Tasks
                 {
                     Application.EnableVisualStyles();
                     Application.SetCompatibleTextRenderingDefault(false);
-                    
+
                     // Initialize AppConfig to ensure the log directory is created
                     string logPath = AppConfig.LogFilePath;
-                    
+
                     // Register for messages from other instances
                     AppMessageHandler.RegisterMessageHandler();
-                    
+
                     MainForm mainForm = new MainForm();
                     Application.Run(mainForm);
                 }
@@ -33,13 +33,13 @@ namespace Common_Tasks
                 {
                     // Find and activate the existing instance instead of showing an error
                     ActivateExistingInstance();
-                    
+
                     // Exit this instance
                     return;
                 }
             }
         }
-        
+
         /// <summary>
         /// Finds and activates the existing instance of the application
         /// </summary>
@@ -48,7 +48,7 @@ namespace Common_Tasks
             // Try to find the main window of the existing instance
             // and send a message to bring it to the foreground
             AppMessageHandler.SendMessageToExistingInstance();
-            
+
             // Pass any command line arguments to the existing instance if needed
             string[] args = Environment.GetCommandLineArgs();
             if (args.Length > 1)

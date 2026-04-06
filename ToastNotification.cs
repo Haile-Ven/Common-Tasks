@@ -17,7 +17,7 @@ namespace SelfSampleProRAD_DB.UserControls
         {
             InitializeComponent();
             Visible = false;
-            
+
             _notificationTimer = new System.Windows.Forms.Timer
             {
                 Interval = 5000
@@ -32,14 +32,15 @@ namespace SelfSampleProRAD_DB.UserControls
         public void AttachToForm(Form parentForm)
         {
             _parentForm = parentForm;
-            
+
 
             if (!_parentForm.Controls.Contains(this))
             {
                 _parentForm.Controls.Add(this);
             }
 
-            _parentForm.Resize += (s, e) => {
+            _parentForm.Resize += (s, e) =>
+            {
                 if (Visible)
                 {
                     PositionNotification();
@@ -53,7 +54,7 @@ namespace SelfSampleProRAD_DB.UserControls
             {
                 int width = Math.Min(300, _parentForm.ClientSize.Width - 40);
                 Width = width;
-                
+
                 // Position at bottom left with a small margin
                 Location = new Point(
                     20,
@@ -106,19 +107,19 @@ namespace SelfSampleProRAD_DB.UserControls
                 g.SmoothingMode = SmoothingMode.AntiAlias;
                 Color blueColor = Color.FromArgb(30, 144, 255); // Dodger Blue
                 Color whiteColor = Color.White;
-                
+
                 // Draw filled blue circle
                 using (SolidBrush brush = new SolidBrush(blueColor))
                 {
                     g.FillEllipse(brush, 2, 2, 20, 20);
                 }
-                
+
                 // Draw white 'i' stem
                 using (Pen pen = new Pen(whiteColor, 2))
                 {
                     g.DrawLine(pen, 12, 10, 12, 18);
                 }
-                
+
                 // Draw white 'i' dot
                 using (SolidBrush brush = new SolidBrush(whiteColor))
                 {
@@ -149,12 +150,12 @@ namespace SelfSampleProRAD_DB.UserControls
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-            
+
             // Set high quality text rendering
             e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
-            
-            Color borderColor = _isErrorStyle ? 
-                Color.FromArgb(255, 99, 71) : 
+
+            Color borderColor = _isErrorStyle ?
+                Color.FromArgb(255, 99, 71) :
                 Color.FromArgb(30, 144, 255); // Match blue color with icon
 
             using (SolidBrush brush = new SolidBrush(borderColor))

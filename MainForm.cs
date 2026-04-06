@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -534,11 +535,11 @@ namespace Common_Tasks
         {
             try
             {
-                // Create a new process start info without the runas verb
+                // Create a new process start info without the runas verb (normal privileges)
                 ProcessStartInfo processInfo = new ProcessStartInfo
                 {
                     FileName = Application.ExecutablePath,
-                    UseShellExecute = true,
+                    UseShellExecute = false, // Use false to avoid inheriting admin privileges
                     // Add a delay to ensure the current instance has time to exit
                     Arguments = "--delayed-start"
                 };
@@ -753,10 +754,7 @@ namespace Common_Tasks
             ToolStripMenuItem returnItem = new ToolStripMenuItem("Return to Normal Mode");
             returnItem.Click += (s, e) =>
             {
-                if (IsRunningAsAdmin())
-                {
-                    RestartWithNormalPrivileges();
-                }
+                RestartWithNormalPrivileges();
             };
             clearNetworkListToolStripMenuItem.DropDownItems.Add(returnItem);
 
@@ -777,6 +775,7 @@ namespace Common_Tasks
                 RestartAsAdmin("--view-network");
                 return;
             }
+            // Already running as admin, show the network menu directly
             ShowViewNetworkMenu();
         }
     }

@@ -18,7 +18,7 @@ namespace Common_Tasks
         public EventClearForm()
         {
             InitializeComponent();
-            
+
             // Initialize and attach toast notification
             toastNotification = new ToastNotification();
             toastNotification.AttachToForm(this);
@@ -80,7 +80,7 @@ namespace Common_Tasks
                     BeginInvoke(new Action(() =>
                     {
                         msgLbl.Text = outputData;
-                        if(outCount!= totalEvent) sucLbl.Text = $"{++outCount} Succeeded.";
+                        if (outCount != totalEvent) sucLbl.Text = $"{++outCount} Succeeded.";
                         prgsBar.Value = outCount * 100 / totalEvent;
                         prgLbl.Text = $"{prgsBar.Value}%";
                     }));

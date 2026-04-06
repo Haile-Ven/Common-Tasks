@@ -8,39 +8,39 @@ namespace Common_Tasks
     {
         private static readonly string DatabasePath;
         private static readonly string ConnectionString;
-        
+
         static DatabaseManager()
         {
             // Always use AppData folder for database storage
             string appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Common Tasks");
-            
+
             // Create the directory if it doesn't exist
             if (!Directory.Exists(appDataFolder))
             {
                 Directory.CreateDirectory(appDataFolder);
             }
-            
+
             // Set the database path to the AppData folder
             DatabasePath = Path.Combine(appDataFolder, "shutdown.db");
-            
+
             // Set the connection string after the database path has been determined
             ConnectionString = $"Data Source={DatabasePath};Version=3;";
-            
+
             // Initialize the database if it doesn't exist
             InitializeDatabase();
         }
-        
+
         /// <summary>
         /// Initializes the SQLite database and creates necessary tables if they don't exist
         /// </summary>
         private static void InitializeDatabase()
         {
             bool newDatabase = !File.Exists(DatabasePath);
-            
+
             using (var connection = new SQLiteConnection(ConnectionString))
             {
                 connection.Open();
-                
+
                 if (newDatabase)
                 {
                     using (var command = new SQLiteCommand(connection))
@@ -59,7 +59,7 @@ namespace Common_Tasks
                 }
             }
         }
-        
+
         /// <summary>
         /// Saves the shutdown schedule to the database
         /// </summary>
@@ -72,11 +72,11 @@ namespace Common_Tasks
             {
                 // First, deactivate any existing active schedules
                 DeactivateAllSchedules();
-                
+
                 using (var connection = new SQLiteConnection(ConnectionString))
                 {
                     connection.Open();
-                    
+
                     using (var command = new SQLiteCommand(connection))
                     {
                         command.CommandText = @"
@@ -84,11 +84,11 @@ namespace Common_Tasks
                                 (start_time, shutdown_time, is_active, created_at) 
                             VALUES 
                                 (@startTime, @shutdownTime, 1, @createdAt)";
-                        
+
                         command.Parameters.AddWithValue("@startTime", startTime.ToString("yyyy-MM-dd HH:mm:ss"));
                         command.Parameters.AddWithValue("@shutdownTime", shutdownTime.ToString("yyyy-MM-dd HH:mm:ss"));
                         command.Parameters.AddWithValue("@createdAt", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-                        
+
                         return command.ExecuteNonQuery() > 0;
                     }
                 }
@@ -99,7 +99,7 @@ namespace Common_Tasks
                 return false;
             }
         }
-        
+
         /// <summary>
         /// Gets the active shutdown schedule from the database
         /// </summary>
@@ -111,7 +111,7 @@ namespace Common_Tasks
                 using (var connection = new SQLiteConnection(ConnectionString))
                 {
                     connection.Open();
-                    
+
                     using (var command = new SQLiteCommand(connection))
                     {
                         command.CommandText = @"
@@ -120,20 +120,20 @@ namespace Common_Tasks
                             WHERE is_active = 1 
                             ORDER BY id DESC 
                             LIMIT 1";
-                        
+
                         using (var reader = command.ExecuteReader())
                         {
                             if (reader.Read())
                             {
                                 DateTime startTime = DateTime.Parse(reader["start_time"].ToString());
                                 DateTime shutdownTime = DateTime.Parse(reader["shutdown_time"].ToString());
-                                
+
                                 return new Tuple<DateTime, DateTime>(startTime, shutdownTime);
                             }
                         }
                     }
                 }
-                
+
                 return null;
             }
             catch (Exception ex)
@@ -142,7 +142,7 @@ namespace Common_Tasks
                 return null;
             }
         }
-        
+
         /// <summary>
         /// Deletes all active shutdown schedules from the database and ensures proper cleanup
         /// </summary>
@@ -154,7 +154,7 @@ namespace Common_Tasks
                 using (var connection = new SQLiteConnection(ConnectionString))
                 {
                     connection.Open();
-                    
+
                     // First delete all active schedules within a transaction
                     using (var transaction = connection.BeginTransaction())
                     {
@@ -166,7 +166,7 @@ namespace Common_Tasks
                                 command.CommandText = "DELETE FROM shutdown_schedule";
                                 command.ExecuteNonQuery();
                             }
-                            
+
                             // Commit the transaction
                             transaction.Commit();
                         }
@@ -177,13 +177,13 @@ namespace Common_Tasks
                             throw new Exception("Failed to delete schedules: " + ex.Message, ex);
                         }
                     }
-                    
+
                     // VACUUM must be executed outside of a transaction
                     using (var command = new SQLiteCommand("VACUUM", connection))
                     {
                         command.ExecuteNonQuery();
                     }
-                    
+
                     return true;
                 }
             }
@@ -195,7 +195,7 @@ namespace Common_Tasks
                 return false;
             }
         }
-        
+
         /// <summary>
         /// Deactivates all shutdown schedules in the database (kept for backward compatibility)
         /// </summary>
@@ -205,7 +205,7 @@ namespace Common_Tasks
             // Now we just call DeleteAllActiveSchedules for consistency
             return DeleteAllActiveSchedules();
         }
-        
+
         /// <summary>
         /// Deletes expired shutdown schedules from the database
         /// </summary>
@@ -217,13 +217,13 @@ namespace Common_Tasks
                 using (var connection = new SQLiteConnection(ConnectionString))
                 {
                     connection.Open();
-                    
+
                     using (var command = new SQLiteCommand(connection))
                     {
                         command.CommandText = @"
                             DELETE FROM shutdown_schedule 
                             WHERE datetime(shutdown_time) <= datetime('now', 'localtime')";
-                        
+
                         command.ExecuteNonQuery();
                         return true;
                     }
@@ -235,7 +235,7 @@ namespace Common_Tasks
                 return false;
             }
         }
-        
+
 
         /// <summary>
         /// Checks if there is an active shutdown schedule
@@ -248,14 +248,14 @@ namespace Common_Tasks
                 using (var connection = new SQLiteConnection(ConnectionString))
                 {
                     connection.Open();
-                    
+
                     using (var command = new SQLiteCommand(connection))
                     {
                         command.CommandText = @"
                             SELECT COUNT(*) 
                             FROM shutdown_schedule 
                             WHERE is_active = 1";
-                        
+
                         long count = (long)command.ExecuteScalar();
                         return count > 0;
                     }
