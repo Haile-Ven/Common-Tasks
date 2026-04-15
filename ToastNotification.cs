@@ -55,7 +55,6 @@ namespace SelfSampleProRAD_DB.UserControls
                 int width = Math.Min(300, _parentForm.ClientSize.Width - 40);
                 Width = width;
 
-                // Position at bottom left with a small margin
                 Location = new Point(
                     20,
                     _parentForm.ClientSize.Height - Height - 20);
@@ -92,7 +91,7 @@ namespace SelfSampleProRAD_DB.UserControls
             }
             else
             {
-                titleLabel.ForeColor = Color.FromArgb(30, 144, 255); // Match blue color with icon
+                titleLabel.ForeColor = Color.FromArgb(30, 144, 255);      
                 iconPictureBox.Image = CreateInfoImage();
             }
             Invalidate();
@@ -105,22 +104,19 @@ namespace SelfSampleProRAD_DB.UserControls
             using (Graphics g = Graphics.FromImage(bmp))
             {
                 g.SmoothingMode = SmoothingMode.AntiAlias;
-                Color blueColor = Color.FromArgb(30, 144, 255); // Dodger Blue
+                Color blueColor = Color.FromArgb(30, 144, 255);   
                 Color whiteColor = Color.White;
 
-                // Draw filled blue circle
                 using (SolidBrush brush = new SolidBrush(blueColor))
                 {
                     g.FillEllipse(brush, 2, 2, 20, 20);
                 }
 
-                // Draw white 'i' stem
                 using (Pen pen = new Pen(whiteColor, 2))
                 {
                     g.DrawLine(pen, 12, 10, 12, 18);
                 }
 
-                // Draw white 'i' dot
                 using (SolidBrush brush = new SolidBrush(whiteColor))
                 {
                     g.FillEllipse(brush, 11, 6, 2, 2);
@@ -151,12 +147,11 @@ namespace SelfSampleProRAD_DB.UserControls
         {
             base.OnPaint(e);
 
-            // Set high quality text rendering
             e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
 
             Color borderColor = _isErrorStyle ?
                 Color.FromArgb(255, 99, 71) :
-                Color.FromArgb(30, 144, 255); // Match blue color with icon
+                Color.FromArgb(30, 144, 255);      
 
             using (SolidBrush brush = new SolidBrush(borderColor))
             {

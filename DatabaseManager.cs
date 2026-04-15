@@ -11,28 +11,20 @@ namespace Common_Tasks
 
         static DatabaseManager()
         {
-            // Always use AppData folder for database storage
             string appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Common Tasks");
 
-            // Create the directory if it doesn't exist
             if (!Directory.Exists(appDataFolder))
             {
                 Directory.CreateDirectory(appDataFolder);
             }
 
-            // Set the database path to the AppData folder
             DatabasePath = Path.Combine(appDataFolder, "shutdown.db");
 
-            // Set the connection string after the database path has been determined
             ConnectionString = $"Data Source={DatabasePath};Version=3;";
 
-            // Initialize the database if it doesn't exist
             InitializeDatabase();
         }
 
-        /// <summary>
-        /// Initializes the SQLite database and creates necessary tables if they don't exist
-        /// </summary>
         private static void InitializeDatabase()
         {
             bool newDatabase = !File.Exists(DatabasePath);
@@ -45,7 +37,6 @@ namespace Common_Tasks
                 {
                     using (var command = new SQLiteCommand(connection))
                     {
-                        // Create the shutdown_schedule table
                         command.CommandText = @"
                             CREATE TABLE IF NOT EXISTS shutdown_schedule (
                                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -60,17 +51,10 @@ namespace Common_Tasks
             }
         }
 
-        /// <summary>
-        /// Saves the shutdown schedule to the database
-        /// </summary>
-        /// <param name="startTime">The time when the shutdown was scheduled</param>
-        /// <param name="shutdownTime">The time when the system will shut down</param>
-        /// <returns>True if the operation was successful</returns>
         public static bool SaveShutdownSchedule(DateTime startTime, DateTime shutdownTime)
         {
             try
             {
-                // First, deactivate any existing active schedules
                 DeactivateAllSchedules();
 
                 using (var connection = new SQLiteConnection(ConnectionString))
@@ -100,10 +84,6 @@ namespace Common_Tasks
             }
         }
 
-        /// <summary>
-        /// Gets the active shutdown schedule from the database
-        /// </summary>
-        /// <returns>Tuple containing start time and shutdown time, or null if no active schedule</returns>
         public static Tuple<DateTime, DateTime> GetActiveShutdownSchedule()
         {
             try
@@ -143,10 +123,6 @@ namespace Common_Tasks
             }
         }
 
-        /// <summary>
-        /// Deletes all active shutdown schedules from the database and ensures proper cleanup
-        /// </summary>
-        /// <returns>True if the operation was successful</returns>
         public static bool DeleteAllActiveSchedules()
         {
             try
@@ -155,30 +131,25 @@ namespace Common_Tasks
                 {
                     connection.Open();
 
-                    // First delete all active schedules within a transaction
                     using (var transaction = connection.BeginTransaction())
                     {
                         try
                         {
                             using (var command = new SQLiteCommand(connection))
                             {
-                                // Delete all schedules regardless of is_active status
                                 command.CommandText = "DELETE FROM shutdown_schedule";
                                 command.ExecuteNonQuery();
                             }
 
-                            // Commit the transaction
                             transaction.Commit();
                         }
                         catch (Exception ex)
                         {
-                            // Rollback the transaction if anything fails
                             transaction.Rollback();
                             throw new Exception("Failed to delete schedules: " + ex.Message, ex);
                         }
                     }
 
-                    // VACUUM must be executed outside of a transaction
                     using (var command = new SQLiteCommand("VACUUM", connection))
                     {
                         command.ExecuteNonQuery();
@@ -189,27 +160,17 @@ namespace Common_Tasks
             }
             catch (Exception ex)
             {
-                // Log the error to a file since Console.WriteLine won't be visible in installed app
                 string errorLogPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "CommonTasks_Error.log");
                 File.AppendAllText(errorLogPath, $"Error deleting schedules: {ex.Message}\r\n");
                 return false;
             }
         }
 
-        /// <summary>
-        /// Deactivates all shutdown schedules in the database (kept for backward compatibility)
-        /// </summary>
-        /// <returns>True if the operation was successful</returns>
         public static bool DeactivateAllSchedules()
         {
-            // Now we just call DeleteAllActiveSchedules for consistency
             return DeleteAllActiveSchedules();
         }
 
-        /// <summary>
-        /// Deletes expired shutdown schedules from the database
-        /// </summary>
-        /// <returns>True if the operation was successful</returns>
         public static bool DeleteExpiredSchedules()
         {
             try
@@ -237,10 +198,6 @@ namespace Common_Tasks
         }
 
 
-        /// <summary>
-        /// Checks if there is an active shutdown schedule
-        /// </summary>
-        /// <returns>True if there is an active schedule</returns>
         public static bool HasActiveSchedule()
         {
             try

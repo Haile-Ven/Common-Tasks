@@ -38,7 +38,6 @@ namespace Common_Tasks
             DatabaseManager.DeleteExpiredSchedules();
             _ = LoadTimer();
 
-            // Set initial button states based on database state
             UpdateButtonStatesBasedOnDatabase();
 
             try
@@ -48,30 +47,23 @@ namespace Common_Tasks
             }
             catch (Exception ex)
             {
-                // Handle the exception without using toast notification
                 MessageBox.Show($"Error initializing toast notification: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
-            // Check for command line arguments
             string[] args = Environment.GetCommandLineArgs();
 
-            // Handle delayed start to avoid instance conflicts
             if (args.Length > 1 && args.Contains("--delayed-start"))
             {
-                // Wait longer to ensure previous instance is fully closed
                 Timer delayTimer = new Timer();
-                delayTimer.Interval = 3000; // 3 seconds should be enough
+                delayTimer.Interval = 3000;
                 delayTimer.Tick += (s, e) =>
                 {
                     delayTimer.Stop();
-                    // Continue with normal initialization
                 };
                 delayTimer.Start();
             }
-            // Handle clear events command
             else if (args.Length > 1 && args.Contains("--clear-events"))
             {
-                // Delay the opening of the form slightly to ensure the UI is fully loaded
                 Timer startupTimer = new Timer();
                 startupTimer.Interval = 500;
                 startupTimer.Tick += (s, e) =>
@@ -81,10 +73,8 @@ namespace Common_Tasks
                 };
                 startupTimer.Start();
             }
-            // Handle view network command
             else if (args.Length > 1 && args.Contains("--view-network"))
             {
-                // Delay slightly to ensure UI is fully loaded
                 Timer startupTimer = new Timer();
                 startupTimer.Interval = 500;
                 startupTimer.Tick += (s, e) =>
@@ -94,19 +84,15 @@ namespace Common_Tasks
                 };
                 startupTimer.Start();
             }
-            // Handle clear network command
             else if (args.Length > 1 && args.Contains("--clear-network"))
             {
-                // Delay the clearing slightly to ensure the UI is fully loaded
                 Timer startupTimer = new Timer();
                 startupTimer.Interval = 500;
                 startupTimer.Tick += async (s, e) =>
                 {
                     startupTimer.Stop();
                     ClearNetworkList();
-                    // Wait for toast to be visible before restarting
                     await Task.Delay(2000);
-                    // Return to normal privileges after clearing
                     if (IsRunningAsAdmin())
                     {
                         RestartWithNormalPrivileges();
@@ -126,7 +112,6 @@ namespace Common_Tasks
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
-            // No special handling for minimize - let it behave normally
         }
 
         private void MinuteBoard_ValueChanged(object sender, EventArgs e)
@@ -141,8 +126,10 @@ namespace Common_Tasks
         private void InitializeShutdownNotification()
         {
 
-            shutdownToastNotification = new ShutdownToastNotification();
-            shutdownToastNotification.Size = timerPanel.Size;
+            shutdownToastNotification = new ShutdownToastNotification
+            {
+                Size = timerPanel.Size
+            };
             timerPanel.Controls.Clear();
             timerPanel.Controls.Add(shutdownToastNotification);
             shutdownToastNotification.Dock = DockStyle.Fill;
@@ -154,7 +141,6 @@ namespace Common_Tasks
         {
             try
             {
-                // Get the active shutdown schedule from the database
                 var schedule = DatabaseManager.GetActiveShutdownSchedule();
                 if (schedule == null)
                 {
@@ -164,7 +150,6 @@ namespace Common_Tasks
                 DateTime startTime = schedule.Item1;
                 DateTime shutdownTime = schedule.Item2;
 
-                // Check if the shutdown time has already passed
                 if (shutdownTime <= DateTime.Now)
                 {
                     DatabaseManager.DeleteAllActiveSchedules();
@@ -192,7 +177,6 @@ namespace Common_Tasks
                 }
                 catch
                 {
-                    // Fallback to MessageBox if toast notification fails
                     MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
@@ -209,11 +193,9 @@ namespace Common_Tasks
                     return;
                 }
 
-                // Get the active shutdown schedule from the database
                 var schedule = DatabaseManager.GetActiveShutdownSchedule();
                 if (schedule == null)
                 {
-                    // No active schedule found
                     return;
                 }
 
@@ -271,7 +253,6 @@ namespace Common_Tasks
                 }
                 catch
                 {
-                    // Fallback to MessageBox if toast notification fails
                     MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
@@ -301,10 +282,8 @@ namespace Common_Tasks
 
                 _ = Process.Start(psi);
 
-                // Save both the shutdown time and the original scheduling time to the database
                 DatabaseManager.SaveShutdownSchedule(DateTime.Now, shutdownTime);
 
-                // Update button states based on database
                 UpdateButtonStatesBasedOnDatabase();
                 _ = LoadTimer();
                 toastNotification.Show("Shutdown scheduled.", "Scheduled", true);
@@ -321,7 +300,6 @@ namespace Common_Tasks
                 isShutdownCancelled = true;
                 DatabaseManager.DeleteAllActiveSchedules();
 
-                // Update button states based on database
                 UpdateButtonStatesBasedOnDatabase();
                 shtDwnTmLbl.Text = string.Empty;
 
@@ -340,7 +318,6 @@ namespace Common_Tasks
                 }
                 catch
                 {
-                    // Fallback to MessageBox if toast notification fails
                     MessageBox.Show("Shutdown canceled.", "Canceled", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
 
@@ -357,14 +334,12 @@ namespace Common_Tasks
 
             if (enabled)
             {
-                // Restore original button appearance - Windows 11 accent blue
                 ShutdownBtn.BackColor = System.Drawing.Color.FromArgb(0, 99, 177);
                 ShutdownBtn.ForeColor = System.Drawing.Color.White;
                 ShutdownBtn.FlatAppearance.BorderColor = ShutdownBtn.BackColor;
             }
             else
             {
-                // Apply disabled style - Windows 11 disabled button
                 ShutdownBtn.BackColor = System.Drawing.Color.FromArgb(233, 233, 233);
                 ShutdownBtn.ForeColor = System.Drawing.Color.FromArgb(153, 153, 153);
                 ShutdownBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(233, 233, 233);
@@ -377,37 +352,29 @@ namespace Common_Tasks
 
             if (enabled)
             {
-                // Restore original button appearance - Windows 11 accent blue
                 CancelBtn.BackColor = System.Drawing.Color.FromArgb(0, 99, 177);
                 CancelBtn.ForeColor = System.Drawing.Color.White;
                 CancelBtn.FlatAppearance.BorderColor = CancelBtn.BackColor;
             }
             else
             {
-                // Apply disabled style - Windows 11 disabled button
                 CancelBtn.BackColor = System.Drawing.Color.FromArgb(233, 233, 233);
                 CancelBtn.ForeColor = System.Drawing.Color.FromArgb(153, 153, 153);
                 CancelBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(233, 233, 233);
             }
         }
 
-        /// <summary>
-        /// Updates button states based on whether there are active schedules in the database
-        /// </summary>
         private void UpdateButtonStatesBasedOnDatabase()
         {
-            // Check if there's an active schedule in the database
             var activeSchedule = DatabaseManager.GetActiveShutdownSchedule();
 
             if (activeSchedule == null)
             {
-                // No active schedule - enable Shutdown button, disable Cancel button
                 UpdateShutdownButtonState(true);
                 UpdateCancelButtonState(false);
             }
             else
             {
-                // Active schedule exists - disable Shutdown button, enable Cancel button
                 UpdateShutdownButtonState(false);
                 UpdateCancelButtonState(true);
             }
@@ -433,15 +400,12 @@ namespace Common_Tasks
             {
                 if (!eventClearFormOpen)
                 {
-                    // Check if the current process has admin privileges
                     if (!IsRunningAsAdmin())
                     {
-                        // Restart the application with admin privileges and pass command line argument
                         RestartAsAdmin("--clear-events");
                         return;
                     }
 
-                    // If we're already running as admin, show the form
                     OpenEventClearForm();
                 }
             }
@@ -453,7 +417,6 @@ namespace Common_Tasks
                 }
                 catch
                 {
-                    // Fallback to MessageBox if toast notification fails
                     MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 ClrEvntBtn.Enabled = true;
@@ -471,7 +434,6 @@ namespace Common_Tasks
 
         private bool IsRunningAsAdmin()
         {
-            // Check if the current process is running with administrative privileges
             using (var identity = System.Security.Principal.WindowsIdentity.GetCurrent())
             {
                 var principal = new System.Security.Principal.WindowsPrincipal(identity);
@@ -483,19 +445,16 @@ namespace Common_Tasks
         {
             try
             {
-                // Create a new process start info
                 ProcessStartInfo processInfo = new ProcessStartInfo
                 {
                     FileName = Application.ExecutablePath,
                     UseShellExecute = true,
-                    Verb = "runas", // This is what triggers the UAC prompt
+                    Verb = "runas",
                     Arguments = arguments
                 };
 
-                // Start the new process
                 Process.Start(processInfo);
 
-                // Clean up resources before exiting
                 if (shutdownToastNotification != null)
                 {
                     shutdownToastNotification.Dispose();
@@ -506,20 +465,16 @@ namespace Common_Tasks
                     toastNotification.Dispose();
                 }
 
-                // Hide the form and tray icon
                 this.Hide();
                 taskTrayIcon.Visible = false;
 
-                // Force garbage collection to release resources
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
 
-                // Exit the application completely
                 Environment.Exit(0);
             }
             catch (Exception ex)
             {
-                // The user likely canceled the UAC prompt
                 try
                 {
                     toastNotification.Show("Administrator privileges required.", "Access Denied", false);
@@ -535,19 +490,15 @@ namespace Common_Tasks
         {
             try
             {
-                // Create a new process start info without the runas verb (normal privileges)
                 ProcessStartInfo processInfo = new ProcessStartInfo
                 {
                     FileName = Application.ExecutablePath,
-                    UseShellExecute = false, // Use false to avoid inheriting admin privileges
-                    // Add a delay to ensure the current instance has time to exit
+                    UseShellExecute = false,
                     Arguments = "--delayed-start"
                 };
 
-                // Start the new process
                 Process.Start(processInfo);
 
-                // Clean up resources before exiting
                 if (shutdownToastNotification != null)
                 {
                     shutdownToastNotification.Dispose();
@@ -558,15 +509,12 @@ namespace Common_Tasks
                     toastNotification.Dispose();
                 }
 
-                // Hide the form and tray icon
                 this.Hide();
                 taskTrayIcon.Visible = false;
 
-                // Force garbage collection to release resources
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
 
-                // Exit the application
                 Environment.Exit(0);
             }
             catch (Exception ex)
@@ -588,7 +536,6 @@ namespace Common_Tasks
             eventClearFormOpen = false;
             EventClearFormClosed?.Invoke();
 
-            // If we're running as admin, restart in normal mode
             if (IsRunningAsAdmin())
             {
                 RestartWithNormalPrivileges();
@@ -630,18 +577,13 @@ namespace Common_Tasks
             }
         }
 
-        /// <summary>
-        /// Override the window procedure to handle custom messages
-        /// </summary>
         protected override void WndProc(ref Message m)
         {
-            // Allow subscribers to handle the message first
             if (MessageReceived != null)
             {
                 MessageReceived.Invoke(this, m);
             }
 
-            // Pass the message to the base class
             base.WndProc(ref m);
         }
 
@@ -652,10 +594,8 @@ namespace Common_Tasks
 
         private void clearNetworkListToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // Check if the current process has admin privileges
             if (!IsRunningAsAdmin())
             {
-                // Restart the application with admin privileges and pass command line argument
                 RestartAsAdmin("--clear-network");
                 return;
             }
@@ -689,10 +629,6 @@ namespace Common_Tasks
             }
         }
 
-        /// <summary>
-        /// Gets all network profiles from the registry
-        /// </summary>
-        /// <returns>List of tuples containing (ProfileName, Guid) for each network</returns>
         private List<(string ProfileName, string Guid)> GetAllNetworkList()
         {
             var networks = new List<(string ProfileName, string Guid)>();
@@ -728,10 +664,8 @@ namespace Common_Tasks
 
         private void ShowViewNetworkMenu()
         {
-            // Get networks and populate the menu
             var networks = GetAllNetworkList();
 
-            // Clear existing items except the header/separator if any
             clearNetworkListToolStripMenuItem.DropDownItems.Clear();
             if (networks.Count == 0)
             {
@@ -749,7 +683,6 @@ namespace Common_Tasks
                 }
             }
 
-            // Add separator and return to normal mode option
             clearNetworkListToolStripMenuItem.DropDownItems.Add(new ToolStripSeparator());
             ToolStripMenuItem returnItem = new ToolStripMenuItem("Return to Normal Mode");
             returnItem.Click += (s, e) =>
@@ -758,24 +691,19 @@ namespace Common_Tasks
             };
             clearNetworkListToolStripMenuItem.DropDownItems.Add(returnItem);
 
-            // Show the menu
             this.BeginInvoke(new Action(() =>
             {
                 clearNetworkListToolStripMenuItem.ShowDropDown();
             }));
-            //clearNetworkListToolStripMenuItem.ShowDropDown();
         }
 
         private void clearNetworkListToolStripMenuItem_MouseHover(object sender, EventArgs e)
         {
-            // Check if the current process has admin privileges
             if (!IsRunningAsAdmin())
             {
-                // Restart the application with admin privileges and pass command line argument
                 RestartAsAdmin("--view-network");
                 return;
             }
-            // Already running as admin, show the network menu directly
             ShowViewNetworkMenu();
         }
     }

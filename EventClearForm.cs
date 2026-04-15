@@ -19,7 +19,6 @@ namespace Common_Tasks
         {
             InitializeComponent();
 
-            // Initialize and attach toast notification
             toastNotification = new ToastNotification();
             toastNotification.AttachToForm(this);
             _ = LoadFormAsync();
@@ -115,7 +114,6 @@ namespace Common_Tasks
         {
             try
             {
-                // Write the batch content to a temporary file
                 string tempBatchFile = Path.Combine(Path.GetTempPath(), "tempBatch.bat");
                 await File.WriteAllTextAsync(tempBatchFile, batchContent);
 
@@ -162,7 +160,6 @@ namespace Common_Tasks
                     string error = errorBuilder.ToString();
                 }
 
-                // Clean up the temporary file
                 if (File.Exists(tempBatchFile))
                 {
                     File.Delete(tempBatchFile);
