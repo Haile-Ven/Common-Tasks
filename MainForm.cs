@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -705,6 +706,16 @@ namespace Common_Tasks
                 return;
             }
             ShowViewNetworkMenu();
+        }
+
+        private void resetPowershellToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt");
+            if (File.Exists(path))
+            {
+                List<string> wrCon = new List<string>{"winget upgrade\nwinget upgrade --all\nwinget upgrade --all --include-unknown\n\n"};
+                File.WriteAllLines(path, wrCon);
+            }
         }
     }
 }
