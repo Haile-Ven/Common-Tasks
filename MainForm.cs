@@ -654,7 +654,7 @@ namespace Common_Tasks
                         }
                         catch (Exception ex)
                         {
-                            Debug.WriteLine($"Failed to read profile {subKeyName}: {ex.Message}");
+                            toastNotification.Show($"Failed to read profile {subKeyName}: {ex.Message}", "WARNING", false);
                         }
                     }
                 }
@@ -715,6 +715,7 @@ namespace Common_Tasks
             {
                 List<string> wrCon = new List<string>{"winget upgrade\nwinget upgrade --all\nwinget upgrade --all --include-unknown\n\n"};
                 File.WriteAllLines(path, wrCon);
+                toastNotification.Show("PowerShell command history reset.", "SUCCESS", true);
             }
         }
     }
