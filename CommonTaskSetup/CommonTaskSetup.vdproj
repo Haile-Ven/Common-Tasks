@@ -21,7 +21,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_0CE7F9D2E179480285931599A01F8B71"
+        "MsmKey" = "8:_D354249694304189B844AF45FB5CE219"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -206,15 +206,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Common Tasks"
-        "ProductCode" = "8:{8FA4644C-82D1-4FE4-BF7E-E696E82005A0}"
-        "PackageCode" = "8:{CC328669-47BD-4641-A374-5E3CF398A0BC}"
+        "ProductCode" = "8:{F7933C86-B88D-4199-9E6B-50047C5341DC}"
+        "PackageCode" = "8:{B2DBD7F9-37A9-4018-A345-B1E5F3B84280}"
         "UpgradeCode" = "8:{EA16CD93-E867-4160-B7E1-0FD36483833E}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:2.1.7"
+        "ProductVersion" = "8:2.1.8"
         "Manufacturer" = "8:Ven"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -327,7 +327,7 @@
         }
         "Shortcut"
         {
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_FC230EAA648B4164B763EA8D38AAE335"
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_AACFE8D8BA7D49E19724413297DC6378"
             {
             "Name" = "8:Common Tasks"
             "Arguments" = "8:"
@@ -335,7 +335,7 @@
             "ShowCmd" = "3:1"
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
-            "Target" = "8:_0CE7F9D2E179480285931599A01F8B71"
+            "Target" = "8:_D354249694304189B844AF45FB5CE219"
             "Folder" = "8:_220EFD06091D4A31831B2865D85E95F1"
             "WorkingFolder" = "8:_2470BA7E44174673A1B37504010D6285"
             "Icon" = "8:_03E529B581F048099439054E7B8FEAAA"
@@ -740,7 +740,7 @@
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_0CE7F9D2E179480285931599A01F8B71"
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_D354249694304189B844AF45FB5CE219"
             {
             "SourcePath" = "8:..\\obj\\Debug\\net8.0-windows\\apphost.exe"
             "TargetName" = "8:"
