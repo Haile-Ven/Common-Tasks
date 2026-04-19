@@ -713,9 +713,23 @@ namespace Common_Tasks
             string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt");
             if (File.Exists(path))
             {
-                List<string> wrCon = new List<string>{"winget upgrade\nwinget upgrade --all\nwinget upgrade --all --include-unknown\n\n"};
+                List<string> wrCon = new List<string> { "winget upgrade\nwinget upgrade --all\nwinget upgrade --all --include-unknown\n" };
                 File.WriteAllLines(path, wrCon);
                 toastNotification.Show("PowerShell command history reset.", "SUCCESS", true);
+            }
+        }
+
+        private void resetPowershellToolStripMenuItem_MouseHover(object sender, EventArgs e)
+        {
+            resetPowershellToolStripMenuItem.DropDownItems.Clear();
+            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt");
+            if (File.Exists(path))
+            {
+                var res = File.ReadAllLines(path);
+                foreach (var line in res)
+                {
+                    resetPowershellToolStripMenuItem.DropDownItems.Add(line);
+                }
             }
         }
     }

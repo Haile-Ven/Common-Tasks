@@ -50,8 +50,8 @@ namespace Common_Tasks
             OptionmenuStrip = new System.Windows.Forms.MenuStrip();
             optionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             clearNetworkListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             resetPowershellToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             groupBox2.SuspendLayout();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)HoursBoard).BeginInit();
@@ -292,19 +292,20 @@ namespace Common_Tasks
             clearNetworkListToolStripMenuItem.Click += clearNetworkListToolStripMenuItem_Click;
             clearNetworkListToolStripMenuItem.MouseHover += clearNetworkListToolStripMenuItem_MouseHover;
             // 
-            // exitToolStripMenuItem
-            // 
-            exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
-            exitToolStripMenuItem.Text = "Exit";
-            exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
-            // 
             // resetPowershellToolStripMenuItem
             // 
             resetPowershellToolStripMenuItem.Name = "resetPowershellToolStripMenuItem";
             resetPowershellToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             resetPowershellToolStripMenuItem.Text = "Reset Powershell";
             resetPowershellToolStripMenuItem.Click += resetPowershellToolStripMenuItem_Click;
+            resetPowershellToolStripMenuItem.MouseHover += resetPowershellToolStripMenuItem_MouseHover;
+            // 
+            // exitToolStripMenuItem
+            // 
+            exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            exitToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            exitToolStripMenuItem.Text = "Exit";
+            exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
             // 
             // MainForm
             // 
