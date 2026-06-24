@@ -510,13 +510,11 @@ namespace Common_Tasks
                     toastNotification.Dispose();
                 }
 
-                this.Hide();
-                taskTrayIcon.Visible = false;
-
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
 
-                Environment.Exit(0);
+                System.Diagnostics.Process.Start(Application.ExecutablePath);
+                Close();
             }
             catch (Exception ex)
             {
@@ -627,6 +625,7 @@ namespace Common_Tasks
                 {
                     toastNotification.Show("Network profiles registry key not found.", "WARNING", false);
                 }
+                RestartWithNormalPrivileges();
             }
         }
 
