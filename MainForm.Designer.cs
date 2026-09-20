@@ -287,7 +287,7 @@ namespace Common_Tasks
             // clearNetworkListToolStripMenuItem
             // 
             clearNetworkListToolStripMenuItem.Name = "clearNetworkListToolStripMenuItem";
-            clearNetworkListToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            clearNetworkListToolStripMenuItem.Size = new System.Drawing.Size(212, 26);
             clearNetworkListToolStripMenuItem.Text = "Clear Network List";
             clearNetworkListToolStripMenuItem.Click += clearNetworkListToolStripMenuItem_Click;
             clearNetworkListToolStripMenuItem.MouseHover += clearNetworkListToolStripMenuItem_MouseHover;
@@ -295,7 +295,7 @@ namespace Common_Tasks
             // resetPowershellToolStripMenuItem
             // 
             resetPowershellToolStripMenuItem.Name = "resetPowershellToolStripMenuItem";
-            resetPowershellToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            resetPowershellToolStripMenuItem.Size = new System.Drawing.Size(212, 26);
             resetPowershellToolStripMenuItem.Text = "Reset Powershell";
             resetPowershellToolStripMenuItem.Click += resetPowershellToolStripMenuItem_Click;
             resetPowershellToolStripMenuItem.MouseHover += resetPowershellToolStripMenuItem_MouseHover;
@@ -303,7 +303,7 @@ namespace Common_Tasks
             // exitToolStripMenuItem
             // 
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            exitToolStripMenuItem.Size = new System.Drawing.Size(212, 26);
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
             // 

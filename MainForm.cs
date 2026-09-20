@@ -92,7 +92,7 @@ namespace Common_Tasks
                 startupTimer.Tick += async (s, e) =>
                 {
                     startupTimer.Stop();
-                    ClearNetworkList();
+                    //ClearNetworkList();
                     await Task.Delay(2000);
                     if (IsRunningAsAdmin())
                     {
@@ -598,28 +598,64 @@ namespace Common_Tasks
                 RestartAsAdmin("--clear-network");
                 return;
             }
-            ClearNetworkList();
+
+            if (sender is ToolStripMenuItem clickedItem)
+            {
+                string networkName = clickedItem.ToolTipText;
+                toastNotification.Show(networkName, "SUCCESS", true);
+                ClearNetworkList(networkName);
+            }
         }
 
-        private void ClearNetworkList()
+        //private void ClearNetworkList()
+        //{
+        //    using (RegistryKey profilesKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\NetworkList\Profiles", true))
+        //    {
+        //        if (profilesKey != null)
+        //        {
+        //            string[] subKeyNames = profilesKey.GetSubKeyNames();
+        //            foreach (string subKeyName in subKeyNames)
+        //            {
+        //                try
+        //                {
+        //                    profilesKey.DeleteSubKeyTree(subKeyName, false);
+        //                }
+        //                catch (Exception ex)
+        //                {
+        //                    toastNotification.Show($"Failed to delete {subKeyName}: {ex.Message}", "WARNING", false);
+        //                }
+        //            }
+        //            toastNotification.Show($"Network list cleared. Deleted {subKeyNames.Length} profiles.", "SUCCESS", true);
+        //        }
+        //        else
+        //        {
+        //            toastNotification.Show("Network profiles registry key not found.", "WARNING", false);
+        //        }
+        //        RestartWithNormalPrivileges();
+        //    }
+        //}
+        private void ClearNetworkList(string subKeyName)
         {
             using (RegistryKey profilesKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\NetworkList\Profiles", true))
             {
                 if (profilesKey != null)
                 {
                     string[] subKeyNames = profilesKey.GetSubKeyNames();
-                    foreach (string subKeyName in subKeyNames)
+                    foreach (string Name in subKeyNames)
                     {
-                        try
+                        if (Name == subKeyName)
                         {
-                            profilesKey.DeleteSubKeyTree(subKeyName, false);
-                        }
-                        catch (Exception ex)
-                        {
-                            toastNotification.Show($"Failed to delete {subKeyName}: {ex.Message}", "WARNING", false);
+                            try
+                            {
+                                profilesKey.DeleteSubKeyTree(subKeyName, false);
+                            }
+                            catch (Exception ex)
+                            {
+                                toastNotification.Show($"Failed to delete {subKeyName}: {ex.Message}", "WARNING", false);
+                            }
                         }
                     }
-                    toastNotification.Show($"Network list cleared. Deleted {subKeyNames.Length} profiles.", "SUCCESS", true);
+                    toastNotification.Show($"{Name} cleared. Deleted {subKeyNames.Length} profiles.", "SUCCESS", true);
                 }
                 else
                 {
@@ -678,7 +714,8 @@ namespace Common_Tasks
                 foreach (var network in networks)
                 {
                     ToolStripMenuItem networkItem = new ToolStripMenuItem(network.ProfileName);
-                    networkItem.ToolTipText = $"GUID: {network.Guid}";
+                    networkItem.ToolTipText = $"{network.Guid}";
+                    networkItem.Click += NetworkSubItem_Click;
                     clearNetworkListToolStripMenuItem.DropDownItems.Add(networkItem);
                 }
             }
@@ -695,6 +732,23 @@ namespace Common_Tasks
             {
                 clearNetworkListToolStripMenuItem.ShowDropDown();
             }));
+        }
+
+        private void NetworkSubItem_Click(object sender, EventArgs e)
+        {
+            if (sender is ToolStripMenuItem clickedItem)
+            {
+                string networkName = clickedItem.ToolTipText;
+
+                if (!IsRunningAsAdmin())
+                {
+                    RestartAsAdmin($"--clear-network \"{networkName}\"");
+                    return;
+                }
+
+                toastNotification.Show(networkName, "SUCCESS", true);
+                ClearNetworkList(networkName);
+            }
         }
 
         private void clearNetworkListToolStripMenuItem_MouseHover(object sender, EventArgs e)
