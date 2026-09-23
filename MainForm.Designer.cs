@@ -51,6 +51,8 @@ namespace Common_Tasks
             optionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             clearNetworkListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             resetPowershellToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            NormalModeItem = new System.Windows.Forms.ToolStripMenuItem();
             exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             groupBox2.SuspendLayout();
             groupBox1.SuspendLayout();
@@ -279,7 +281,7 @@ namespace Common_Tasks
             // 
             // optionToolStripMenuItem
             // 
-            optionToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { clearNetworkListToolStripMenuItem, resetPowershellToolStripMenuItem, exitToolStripMenuItem });
+            optionToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { clearNetworkListToolStripMenuItem, resetPowershellToolStripMenuItem, toolStripSeparator2, NormalModeItem, exitToolStripMenuItem });
             optionToolStripMenuItem.Name = "optionToolStripMenuItem";
             optionToolStripMenuItem.Size = new System.Drawing.Size(69, 24);
             optionToolStripMenuItem.Text = "Option";
@@ -287,7 +289,7 @@ namespace Common_Tasks
             // clearNetworkListToolStripMenuItem
             // 
             clearNetworkListToolStripMenuItem.Name = "clearNetworkListToolStripMenuItem";
-            clearNetworkListToolStripMenuItem.Size = new System.Drawing.Size(212, 26);
+            clearNetworkListToolStripMenuItem.Size = new System.Drawing.Size(250, 26);
             clearNetworkListToolStripMenuItem.Text = "Clear Network List";
             clearNetworkListToolStripMenuItem.Click += clearNetworkListToolStripMenuItem_Click;
             clearNetworkListToolStripMenuItem.MouseHover += clearNetworkListToolStripMenuItem_MouseHover;
@@ -295,15 +297,27 @@ namespace Common_Tasks
             // resetPowershellToolStripMenuItem
             // 
             resetPowershellToolStripMenuItem.Name = "resetPowershellToolStripMenuItem";
-            resetPowershellToolStripMenuItem.Size = new System.Drawing.Size(212, 26);
+            resetPowershellToolStripMenuItem.Size = new System.Drawing.Size(250, 26);
             resetPowershellToolStripMenuItem.Text = "Reset Powershell";
             resetPowershellToolStripMenuItem.Click += resetPowershellToolStripMenuItem_Click;
             resetPowershellToolStripMenuItem.MouseHover += resetPowershellToolStripMenuItem_MouseHover;
             // 
+            // toolStripSeparator2
+            // 
+            toolStripSeparator2.Name = "toolStripSeparator2";
+            toolStripSeparator2.Size = new System.Drawing.Size(247, 6);
+            // 
+            // NormalModeItem
+            // 
+            NormalModeItem.Name = "NormalModeItem";
+            NormalModeItem.Size = new System.Drawing.Size(250, 26);
+            NormalModeItem.Text = "Return to Normal Mode";
+            NormalModeItem.Click += NormalModeItem_Click;
+            // 
             // exitToolStripMenuItem
             // 
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new System.Drawing.Size(212, 26);
+            exitToolStripMenuItem.Size = new System.Drawing.Size(250, 26);
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
             // 
@@ -364,6 +378,8 @@ namespace Common_Tasks
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem clearNetworkListToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem resetPowershellToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem NormalModeItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
     }
 }
 

@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -37,7 +36,7 @@ namespace Common_Tasks
 
             InitializeShutdownNotification();
             DatabaseManager.DeleteExpiredSchedules();
-            _ = LoadTimer();
+            //_ = LoadTimer();
 
             UpdateButtonStatesBasedOnDatabase();
 
@@ -92,7 +91,6 @@ namespace Common_Tasks
                 startupTimer.Tick += async (s, e) =>
                 {
                     startupTimer.Stop();
-                    //ClearNetworkList();
                     await Task.Delay(2000);
                     if (IsRunningAsAdmin())
                     {
@@ -102,6 +100,12 @@ namespace Common_Tasks
                 startupTimer.Start();
             }
 
+        }
+
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
+            _ = LoadTimer();
         }
 
         private void ExitItem_Click(object sender, EventArgs e)
@@ -160,13 +164,18 @@ namespace Common_Tasks
                 shtDwnTmLbl.Text = string.Empty;
                 remTmLbl.Text = string.Empty;
 
-                UpdateShutdownButtonState(false);
-                UpdateCancelButtonState(true);
+                this.BeginInvoke(new Action(() =>
+                {
+                    UpdateShutdownButtonState(false);
+                    UpdateCancelButtonState(true);
 
-                shutdownToastNotification.Visible = true;
-                shutdownToastNotification.BringToFront();
+                    shutdownToastNotification.Visible = true;
+                    shutdownToastNotification.BringToFront();
+                    shutdownToastNotification.ShowShutdownCountdown(shutdownTime);
 
-                shutdownToastNotification.ShowShutdownCountdown(shutdownTime);
+                    shutdownToastNotification.Refresh();
+                    timerPanel.Refresh();
+                }));
 
                 await CalculateTime();
             }
@@ -489,43 +498,16 @@ namespace Common_Tasks
 
         private void RestartWithNormalPrivileges()
         {
+            string appPath = Application.ExecutablePath;
+
             try
             {
-                ProcessStartInfo processInfo = new ProcessStartInfo
-                {
-                    FileName = Application.ExecutablePath,
-                    UseShellExecute = false,
-                    Arguments = "--delayed-start"
-                };
-
-                Process.Start(processInfo);
-
-                if (shutdownToastNotification != null)
-                {
-                    shutdownToastNotification.Dispose();
-                }
-
-                if (toastNotification != null)
-                {
-                    toastNotification.Dispose();
-                }
-
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-
-                System.Diagnostics.Process.Start(Application.ExecutablePath);
-                Close();
+                Process.Start("explorer.exe", $"\"{appPath}\"");
+                Application.Exit();
             }
             catch (Exception ex)
             {
-                try
-                {
-                    toastNotification.Show($"Error restarting application: {ex.Message}", "ERROR", false);
-                }
-                catch
-                {
-                    MessageBox.Show($"Error restarting application: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                MessageBox.Show($"Failed to restart: {ex.Message}");
             }
         }
 
@@ -602,38 +584,15 @@ namespace Common_Tasks
             if (sender is ToolStripMenuItem clickedItem)
             {
                 string networkName = clickedItem.ToolTipText;
+                if (networkName == null)
+                {
+                    return;
+                }
                 toastNotification.Show(networkName, "SUCCESS", true);
                 ClearNetworkList(networkName);
             }
         }
 
-        //private void ClearNetworkList()
-        //{
-        //    using (RegistryKey profilesKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\NetworkList\Profiles", true))
-        //    {
-        //        if (profilesKey != null)
-        //        {
-        //            string[] subKeyNames = profilesKey.GetSubKeyNames();
-        //            foreach (string subKeyName in subKeyNames)
-        //            {
-        //                try
-        //                {
-        //                    profilesKey.DeleteSubKeyTree(subKeyName, false);
-        //                }
-        //                catch (Exception ex)
-        //                {
-        //                    toastNotification.Show($"Failed to delete {subKeyName}: {ex.Message}", "WARNING", false);
-        //                }
-        //            }
-        //            toastNotification.Show($"Network list cleared. Deleted {subKeyNames.Length} profiles.", "SUCCESS", true);
-        //        }
-        //        else
-        //        {
-        //            toastNotification.Show("Network profiles registry key not found.", "WARNING", false);
-        //        }
-        //        RestartWithNormalPrivileges();
-        //    }
-        //}
         private void ClearNetworkList(string subKeyName)
         {
             using (RegistryKey profilesKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\NetworkList\Profiles", true))
@@ -720,14 +679,6 @@ namespace Common_Tasks
                 }
             }
 
-            clearNetworkListToolStripMenuItem.DropDownItems.Add(new ToolStripSeparator());
-            ToolStripMenuItem returnItem = new ToolStripMenuItem("Return to Normal Mode");
-            returnItem.Click += (s, e) =>
-            {
-                RestartWithNormalPrivileges();
-            };
-            clearNetworkListToolStripMenuItem.DropDownItems.Add(returnItem);
-
             this.BeginInvoke(new Action(() =>
             {
                 clearNetworkListToolStripMenuItem.ShowDropDown();
@@ -742,7 +693,7 @@ namespace Common_Tasks
 
                 if (!IsRunningAsAdmin())
                 {
-                    RestartAsAdmin($"--clear-network \"{networkName}\"");
+                    RestartAsAdmin($"--clear-network");
                     return;
                 }
 
@@ -783,6 +734,14 @@ namespace Common_Tasks
                 {
                     resetPowershellToolStripMenuItem.DropDownItems.Add(line);
                 }
+            }
+        }
+
+        private void NormalModeItem_Click(object sender, EventArgs e)
+        {
+            if (IsRunningAsAdmin())
+            {
+                RestartWithNormalPrivileges();
             }
         }
     }

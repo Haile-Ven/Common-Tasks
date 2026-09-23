@@ -206,15 +206,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Common Tasks"
-        "ProductCode" = "8:{F7933C86-B88D-4199-9E6B-50047C5341DC}"
-        "PackageCode" = "8:{B2DBD7F9-37A9-4018-A345-B1E5F3B84280}"
+        "ProductCode" = "8:{CE2A2400-C995-4535-AE02-CADB66A4EB14}"
+        "PackageCode" = "8:{015294C1-643B-4379-AC17-121DB1799F44}"
         "UpgradeCode" = "8:{EA16CD93-E867-4160-B7E1-0FD36483833E}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:2.1.8"
+        "ProductVersion" = "8:2.1.9"
         "Manufacturer" = "8:Ven"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -742,7 +742,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_D354249694304189B844AF45FB5CE219"
             {
-            "SourcePath" = "8:..\\obj\\Debug\\net8.0-windows\\apphost.exe"
+            "SourcePath" = "8:..\\obj\\Debug\\net10.0-windows7.0\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_2470BA7E44174673A1B37504010D6285"

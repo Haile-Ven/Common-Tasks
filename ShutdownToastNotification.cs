@@ -16,10 +16,10 @@ namespace Common_Tasks
         private bool _isVisible = false;
         private Form _parentForm;
 
-        private Color _progressColor = Color.FromArgb(76, 175, 80);  
-        private Color _backgroundColor = Color.FromArgb(240, 240, 240);   
-        private Color _textColor = Color.FromArgb(60, 60, 60);   
-        private Color _titleColor = Color.FromArgb(76, 175, 80);  
+        private Color _progressColor = Color.FromArgb(76, 175, 80);
+        private Color _backgroundColor = Color.FromArgb(240, 240, 240);
+        private Color _textColor = Color.FromArgb(60, 60, 60);
+        private Color _titleColor = Color.FromArgb(76, 175, 80);
 
         private Label _titleLabel;
         private Label _timeRemainingLabel;
@@ -111,8 +111,8 @@ namespace Common_Tasks
             if (_parentForm != null)
             {
                 Location = new Point(
-                    _parentForm.ClientSize.Width - Width - 20,    
-                    _parentForm.ClientSize.Height - Height - 20);    
+                    _parentForm.ClientSize.Width - Width - 20,
+                    _parentForm.ClientSize.Height - Height - 20);
             }
         }
 
@@ -231,7 +231,7 @@ namespace Common_Tasks
                 _progressPercentage = 0.0f;
                 _updateTimer.Stop();
 
-                Invalidate();    
+                Invalidate();
                 return;
             }
 

@@ -91,7 +91,7 @@ namespace SelfSampleProRAD_DB.UserControls
             }
             else
             {
-                titleLabel.ForeColor = Color.FromArgb(30, 144, 255);      
+                titleLabel.ForeColor = Color.FromArgb(30, 144, 255);
                 iconPictureBox.Image = CreateInfoImage();
             }
             Invalidate();
@@ -104,7 +104,7 @@ namespace SelfSampleProRAD_DB.UserControls
             using (Graphics g = Graphics.FromImage(bmp))
             {
                 g.SmoothingMode = SmoothingMode.AntiAlias;
-                Color blueColor = Color.FromArgb(30, 144, 255);   
+                Color blueColor = Color.FromArgb(30, 144, 255);
                 Color whiteColor = Color.White;
 
                 using (SolidBrush brush = new SolidBrush(blueColor))
@@ -151,7 +151,7 @@ namespace SelfSampleProRAD_DB.UserControls
 
             Color borderColor = _isErrorStyle ?
                 Color.FromArgb(255, 99, 71) :
-                Color.FromArgb(30, 144, 255);      
+                Color.FromArgb(30, 144, 255);
 
             using (SolidBrush brush = new SolidBrush(borderColor))
             {
