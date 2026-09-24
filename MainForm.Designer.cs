@@ -54,6 +54,8 @@ namespace Common_Tasks
             toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             NormalModeItem = new System.Windows.Forms.ToolStripMenuItem();
             exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            toolStripSep = new System.Windows.Forms.ToolStripTextBox();
+            toolStripAdminMode = new System.Windows.Forms.ToolStripTextBox();
             groupBox2.SuspendLayout();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)HoursBoard).BeginInit();
@@ -272,7 +274,7 @@ namespace Common_Tasks
             // 
             OptionmenuStrip.Dock = System.Windows.Forms.DockStyle.Bottom;
             OptionmenuStrip.ImageScalingSize = new System.Drawing.Size(20, 20);
-            OptionmenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { optionToolStripMenuItem });
+            OptionmenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { optionToolStripMenuItem, toolStripSep, toolStripAdminMode });
             OptionmenuStrip.Location = new System.Drawing.Point(0, 476);
             OptionmenuStrip.Name = "OptionmenuStrip";
             OptionmenuStrip.Size = new System.Drawing.Size(328, 28);
@@ -320,6 +322,29 @@ namespace Common_Tasks
             exitToolStripMenuItem.Size = new System.Drawing.Size(250, 26);
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
+            // 
+            // toolStripSep
+            // 
+            toolStripSep.BackColor = System.Drawing.SystemColors.Control;
+            toolStripSep.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            toolStripSep.Enabled = false;
+            toolStripSep.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            toolStripSep.ForeColor = System.Drawing.Color.ForestGreen;
+            toolStripSep.MaxLength = 4000;
+            toolStripSep.Name = "toolStripSep";
+            toolStripSep.Size = new System.Drawing.Size(100, 24);
+            // 
+            // toolStripAdminMode
+            // 
+            toolStripAdminMode.BackColor = System.Drawing.SystemColors.Control;
+            toolStripAdminMode.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            toolStripAdminMode.Enabled = false;
+            toolStripAdminMode.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            toolStripAdminMode.ForeColor = System.Drawing.Color.FromArgb(0, 192, 0);
+            toolStripAdminMode.MergeIndex = 0;
+            toolStripAdminMode.Name = "toolStripAdminMode";
+            toolStripAdminMode.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            toolStripAdminMode.Size = new System.Drawing.Size(90, 24);
             // 
             // MainForm
             // 
@@ -380,6 +405,8 @@ namespace Common_Tasks
         private System.Windows.Forms.ToolStripMenuItem resetPowershellToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem NormalModeItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripTextBox toolStripAdminMode;
+        private System.Windows.Forms.ToolStripTextBox toolStripSep;
     }
 }
 

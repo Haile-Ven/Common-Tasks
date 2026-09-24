@@ -36,8 +36,6 @@ namespace Common_Tasks
 
             InitializeShutdownNotification();
             DatabaseManager.DeleteExpiredSchedules();
-            //_ = LoadTimer();
-
             UpdateButtonStatesBasedOnDatabase();
 
             try
@@ -48,6 +46,11 @@ namespace Common_Tasks
             catch (Exception ex)
             {
                 MessageBox.Show($"Error initializing toast notification: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            if (IsRunningAsAdmin())
+            {
+                toolStripAdminMode.Text = " Admin Mode";
             }
 
             string[] args = Environment.GetCommandLineArgs();
@@ -589,11 +592,11 @@ namespace Common_Tasks
                     return;
                 }
                 toastNotification.Show(networkName, "SUCCESS", true);
-                ClearNetworkList(networkName);
+                ClearNetworkProfile(networkName);
             }
         }
 
-        private void ClearNetworkList(string subKeyName)
+        private void ClearNetworkProfile(string subKeyName)
         {
             using (RegistryKey profilesKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\NetworkList\Profiles", true))
             {
@@ -614,13 +617,12 @@ namespace Common_Tasks
                             }
                         }
                     }
-                    toastNotification.Show($"{Name} cleared. Deleted {subKeyNames.Length} profiles.", "SUCCESS", true);
+                    toastNotification.Show($"{Name} cleared. Deleted profile named {subKeyName}.", "SUCCESS", true);
                 }
                 else
                 {
                     toastNotification.Show("Network profiles registry key not found.", "WARNING", false);
                 }
-                RestartWithNormalPrivileges();
             }
         }
 
@@ -698,7 +700,7 @@ namespace Common_Tasks
                 }
 
                 toastNotification.Show(networkName, "SUCCESS", true);
-                ClearNetworkList(networkName);
+                ClearNetworkProfile(networkName);
             }
         }
 
