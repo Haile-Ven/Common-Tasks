@@ -617,7 +617,7 @@ namespace Common_Tasks
                             }
                         }
                     }
-                    toastNotification.Show($"Deleted profile named {subKeyName} successfully.", "SUCCESS", true);
+                    toastNotification.Show($"Deleted profile successfully.", "SUCCESS", true);
                 }
                 else
                 {
